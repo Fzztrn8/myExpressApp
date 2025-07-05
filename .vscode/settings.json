@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/4b42bf42-87aa-486c-a9cf-b947462562d1/resourceGroups/HarmonyServer_group/providers/Microsoft.Web/sites/harmonyServise",
+    "appService.deploySubpath": "."
+}
