@@ -11,4 +11,9 @@ router.get('/test', function(req, res) {
   res.json({ status: 'success', message: 'This is a test API endpoint' });
 });
 
+/* GET API documentation page */
+router.get('/api-docs', function(req, res) {
+  res.render('api-docs');
+});
+
 module.exports = router;
