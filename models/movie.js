@@ -74,6 +74,64 @@ class Movie {
     }
   }
 
+  // 创建电影
+  static async createMovie(movieData) {
+    try {
+      const query = `
+        INSERT INTO movies (title, director, actor, type, score, image, description)
+        VALUES (@param1, @param2, @param3, @param4, @param5, @param6, @param7)
+      `;
+      const result = await db.query(query, [
+        movieData.title,
+        movieData.director,
+        movieData.actor,
+        movieData.type,
+        movieData.score,
+        movieData.image,
+        movieData.description
+      ]);
+      return result;
+    } catch (error) {
+      throw new Error(`创建电影失败: ${error.message}`);
+    }
+  }
+
+  // 更新电影
+  static async updateMovie(id, movieData) {
+    try {
+      const query = `
+        UPDATE movies 
+        SET title = @param1, director = @param2, actor = @param3, 
+            type = @param4, score = @param5, image = @param6, description = @param7
+        WHERE id = @param8
+      `;
+      const result = await db.query(query, [
+        movieData.title,
+        movieData.director,
+        movieData.actor,
+        movieData.type,
+        movieData.score,
+        movieData.image,
+        movieData.description,
+        id
+      ]);
+      return result;
+    } catch (error) {
+      throw new Error(`更新电影失败: ${error.message}`);
+    }
+  }
+
+  // 删除电影
+  static async deleteMovie(id) {
+    try {
+      const query = 'DELETE FROM movies WHERE id = @param1';
+      const result = await db.query(query, [id]);
+      return result;
+    } catch (error) {
+      throw new Error(`删除电影失败: ${error.message}`);
+    }
+  }
+
   // 获取高分电影
   static async getTopRatedMovies(limit = 10) {
     try {

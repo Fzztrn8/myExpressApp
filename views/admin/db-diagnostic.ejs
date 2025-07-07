@@ -1,0 +1,549 @@
+<%- include('../partials/header') %>
+
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-stethoscope"></i> 数据库连接诊断</h2>
+        <div>
+          <button type="button" class="btn btn-primary" onclick="testConnection()">
+            <i class="fas fa-plug"></i> 测试连接
+          </button>
+          <a href="/admin" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> 返回管理后台
+          </a>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="mb-0"><i class="fas fa-info-circle"></i> 环境信息</h5>
+            </div>
+            <div class="card-body">
+              <table class="table table-sm">
+                <tr>
+                  <td><strong>Node环境:</strong></td>
+                  <td><%= diagnostic.environment?.nodeEnv || '未设置' %></td>
+                </tr>
+                <tr>
+                  <td><strong>模拟数据模式:</strong></td>
+                  <td>
+                    <% if (diagnostic.environment?.useMockData) { %>
+                      <span class="badge bg-warning">启用</span>
+                    <% } else { %>
+                      <span class="badge bg-success">禁用</span>
+                    <% } %>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>诊断时间:</strong></td>
+                  <td><%= diagnostic.timestamp?.toLocaleString('zh-CN') %></td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="mb-0"><i class="fas fa-cog"></i> 配置状态</h5>
+            </div>
+            <div class="card-body">
+              <table class="table table-sm">
+                <tr>
+                  <td><strong>用户名:</strong></td>
+                  <td>
+                    <% if (diagnostic.environment?.hasConfig?.user) { %>
+                      <span class="badge bg-success">已配置</span>
+                    <% } else { %>
+                      <span class="badge bg-danger">未配置</span>
+                    <% } %>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>密码:</strong></td>
+                  <td>
+                    <% if (diagnostic.environment?.hasConfig?.password) { %>
+                      <span class="badge bg-success">已配置</span>
+                    <% } else { %>
+                      <span class="badge bg-danger">未配置</span>
+                    <% } %>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>服务器:</strong></td>
+                  <td>
+                    <% if (diagnostic.environment?.hasConfig?.server) { %>
+                      <span class="badge bg-success">已配置</span>
+                    <% } else { %>
+                      <span class="badge bg-danger">未配置</span>
+                    <% } %>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>数据库:</strong></td>
+                  <td>
+                    <% if (diagnostic.environment?.hasConfig?.database) { %>
+                      <span class="badge bg-success">已配置</span>
+                    <% } else { %>
+                      <span class="badge bg-danger">未配置</span>
+                    <% } %>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="mb-0"><i class="fas fa-network-wired"></i> 网络连接</h5>
+            </div>
+            <div class="card-body">
+              <table class="table table-sm">
+                <tr>
+                  <td><strong>服务器地址:</strong></td>
+                  <td><code><%= diagnostic.network?.serverAddress %></code></td>
+                </tr>
+                <tr>
+                  <td><strong>端口:</strong></td>
+                  <td><%= diagnostic.network?.port %></td>
+                </tr>
+                <tr>
+                  <td><strong>网络可达性:</strong></td>
+                  <td>
+                    <% if (diagnostic.network?.canReachServer) { %>
+                      <span class="badge bg-success">可达</span>
+                    <% } else { %>
+                      <span class="badge bg-danger">不可达</span>
+                    <% } %>
+                  </td>
+                </tr>
+                <% if (diagnostic.network?.error) { %>
+                  <tr>
+                    <td><strong>网络错误:</strong></td>
+                    <td><span class="text-danger"><%= diagnostic.network.error %></span></td>
+                  </tr>
+                <% } %>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="mb-0"><i class="fas fa-database"></i> 连接状态</h5>
+            </div>
+            <div class="card-body">
+              <table class="table table-sm">
+                <tr>
+                  <td><strong>连接状态:</strong></td>
+                  <td>
+                    <% if (diagnostic.connection?.connected) { %>
+                      <span class="badge bg-success">已连接</span>
+                    <% } else { %>
+                      <span class="badge bg-danger">未连接</span>
+                    <% } %>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>最后检查:</strong></td>
+                  <td>
+                    <% if (diagnostic.connection?.lastCheck) { %>
+                      <%= diagnostic.connection.lastCheck.toLocaleString('zh-CN') %>
+                    <% } else { %>
+                      <span class="text-muted">未检查</span>
+                    <% } %>
+                  </td>
+                </tr>
+                <% if (diagnostic.connection?.error) { %>
+                  <tr>
+                    <td><strong>错误信息:</strong></td>
+                    <td><span class="text-danger"><%= diagnostic.connection.error %></span></td>
+                  </tr>
+                <% } %>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0"><i class="fas fa-shield-alt"></i> 连接监控状态</h5>
+              <div>
+                <button type="button" class="btn btn-sm btn-success" onclick="startMonitor()" id="startMonitorBtn">
+                  <i class="fas fa-play"></i> 启动监控
+                </button>
+                <button type="button" class="btn btn-sm btn-danger" onclick="stopMonitor()" id="stopMonitorBtn">
+                  <i class="fas fa-stop"></i> 停止监控
+                </button>
+              </div>
+            </div>
+            <div class="card-body">
+              <table class="table table-sm">
+                <tr>
+                  <td><strong>监控状态:</strong></td>
+                  <td>
+                    <% if (diagnostic.monitor?.isRunning) { %>
+                      <span class="badge bg-success">运行中</span>
+                    <% } else { %>
+                      <span class="badge bg-secondary">已停止</span>
+                    <% } %>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>检查间隔:</strong></td>
+                  <td><%= (diagnostic.monitor?.checkInterval || 0) / 1000 %> 秒</td>
+                </tr>
+                <tr>
+                  <td><strong>最后成功检查:</strong></td>
+                  <td>
+                    <% if (diagnostic.monitor?.lastSuccessfulCheck) { %>
+                      <%= new Date(diagnostic.monitor.lastSuccessfulCheck).toLocaleString('zh-CN') %>
+                    <% } else { %>
+                      <span class="text-muted">无</span>
+                    <% } %>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>连续失败次数:</strong></td>
+                  <td>
+                    <span class="<%= (diagnostic.monitor?.consecutiveFailures || 0) > 0 ? 'text-danger' : 'text-success' %>">
+                      <%= diagnostic.monitor?.consecutiveFailures || 0 %> / <%= diagnostic.monitor?.maxConsecutiveFailures || 0 %>
+                    </span>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="mb-0"><i class="fas fa-cogs"></i> 监控操作</h5>
+            </div>
+            <div class="card-body">
+              <div class="d-grid gap-2">
+                <button type="button" class="btn btn-primary" onclick="checkConnection()">
+                  <i class="fas fa-sync"></i> 手动检查连接
+                </button>
+                <button type="button" class="btn btn-info" onclick="getMonitorStatus()">
+                  <i class="fas fa-info-circle"></i> 刷新监控状态
+                </button>
+                <button type="button" class="btn btn-warning" onclick="showConfigModal()">
+                  <i class="fas fa-cog"></i> 配置监控参数
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-lightbulb"></i> 故障排除建议</h5>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info">
+            <h6><i class="fas fa-info-circle"></i> 常见问题解决方案：</h6>
+            <ul class="mb-0">
+              <li><strong>连接超时：</strong>检查网络连接、防火墙设置和Azure SQL Database防火墙规则</li>
+              <li><strong>登录失败：</strong>验证用户名、密码和数据库名称是否正确</li>
+              <li><strong>服务器不可达：</strong>确认服务器地址正确，检查网络连接</li>
+              <li><strong>配置缺失：</strong>确保设置了所有必需的环境变量</li>
+            </ul>
+          </div>
+          
+          <div class="alert alert-warning">
+            <h6><i class="fas fa-exclamation-triangle"></i> Azure SQL Database 配置检查：</h6>
+            <ul class="mb-0">
+              <li>在Azure门户中检查SQL Database的防火墙规则</li>
+              <li>确保你的IP地址已添加到防火墙允许列表中</li>
+              <li>检查数据库服务器是否处于活动状态</li>
+              <li>验证连接字符串中的服务器名称格式</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 配置模态框 -->
+<div class="modal fade" id="configModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-cog"></i> 监控配置</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="configForm">
+          <div class="mb-3">
+            <label for="checkInterval" class="form-label">检查间隔 (秒)</label>
+            <input type="number" class="form-control" id="checkInterval" name="checkInterval" 
+                   value="<%= (diagnostic.monitor?.checkInterval || 30000) / 1000 %>" min="10" max="300">
+            <div class="form-text">建议范围: 10-300秒</div>
+          </div>
+          <div class="mb-3">
+            <label for="maxRetries" class="form-label">最大重试次数</label>
+            <input type="number" class="form-control" id="maxRetries" name="maxRetries" 
+                   value="<%= diagnostic.monitor?.maxRetries || 3 %>" min="1" max="10">
+          </div>
+          <div class="mb-3">
+            <label for="retryDelay" class="form-label">重试延迟 (秒)</label>
+            <input type="number" class="form-control" id="retryDelay" name="retryDelay" 
+                   value="<%= (diagnostic.monitor?.retryDelay || 5000) / 1000 %>" min="1" max="60">
+          </div>
+          <div class="mb-3">
+            <label for="maxConsecutiveFailures" class="form-label">最大连续失败次数</label>
+            <input type="number" class="form-control" id="maxConsecutiveFailures" name="maxConsecutiveFailures" 
+                   value="<%= diagnostic.monitor?.maxConsecutiveFailures || 5 %>" min="1" max="20">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" onclick="updateConfig()">保存配置</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+async function testConnection() {
+  const button = event.target;
+  const originalText = button.innerHTML;
+  
+  try {
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 测试中...';
+    
+    const response = await fetch('/admin/test-connection', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      showAlert('success', '连接测试成功！');
+    } else {
+      showAlert('danger', `连接测试失败: ${result.message}`);
+    }
+    
+    // 刷新页面以更新状态
+    setTimeout(() => {
+      location.reload();
+    }, 2000);
+    
+  } catch (error) {
+    showAlert('danger', `测试失败: ${error.message}`);
+  } finally {
+    button.disabled = false;
+    button.innerHTML = originalText;
+  }
+}
+
+async function startMonitor() {
+  try {
+    const response = await fetch('/admin/start-monitor', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      showAlert('success', '连接监控已启动！');
+      updateMonitorButtons(true);
+    } else {
+      showAlert('danger', `启动监控失败: ${result.message}`);
+    }
+    
+    setTimeout(() => {
+      location.reload();
+    }, 2000);
+    
+  } catch (error) {
+    showAlert('danger', `启动失败: ${error.message}`);
+  }
+}
+
+async function stopMonitor() {
+  try {
+    const response = await fetch('/admin/stop-monitor', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      showAlert('success', '连接监控已停止！');
+      updateMonitorButtons(false);
+    } else {
+      showAlert('danger', `停止监控失败: ${result.message}`);
+    }
+    
+    setTimeout(() => {
+      location.reload();
+    }, 2000);
+    
+  } catch (error) {
+    showAlert('danger', `停止失败: ${error.message}`);
+  }
+}
+
+async function checkConnection() {
+  const button = event.target;
+  const originalText = button.innerHTML;
+  
+  try {
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 检查中...';
+    
+    const response = await fetch('/admin/check-connection', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      showAlert('success', '连接检查已完成！');
+    } else {
+      showAlert('danger', `连接检查失败: ${result.message}`);
+    }
+    
+    setTimeout(() => {
+      location.reload();
+    }, 2000);
+    
+  } catch (error) {
+    showAlert('danger', `检查失败: ${error.message}`);
+  } finally {
+    button.disabled = false;
+    button.innerHTML = originalText;
+  }
+}
+
+async function getMonitorStatus() {
+  try {
+    const response = await fetch('/admin/monitor-status');
+    const result = await response.json();
+    
+    if (result.success) {
+      showAlert('info', '监控状态已刷新！');
+    } else {
+      showAlert('danger', `获取状态失败: ${result.message}`);
+    }
+    
+    setTimeout(() => {
+      location.reload();
+    }, 1000);
+    
+  } catch (error) {
+    showAlert('danger', `获取状态失败: ${error.message}`);
+  }
+}
+
+function showConfigModal() {
+  const modal = new bootstrap.Modal(document.getElementById('configModal'));
+  modal.show();
+}
+
+async function updateConfig() {
+  try {
+    const form = document.getElementById('configForm');
+    const formData = new FormData(form);
+    
+    const config = {
+      checkInterval: parseInt(formData.get('checkInterval')) * 1000,
+      maxRetries: parseInt(formData.get('maxRetries')),
+      retryDelay: parseInt(formData.get('retryDelay')) * 1000,
+      maxConsecutiveFailures: parseInt(formData.get('maxConsecutiveFailures'))
+    };
+    
+    const response = await fetch('/admin/update-monitor-config', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(config)
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      showAlert('success', '监控配置已更新！');
+      bootstrap.Modal.getInstance(document.getElementById('configModal')).hide();
+    } else {
+      showAlert('danger', `更新配置失败: ${result.message}`);
+    }
+    
+    setTimeout(() => {
+      location.reload();
+    }, 2000);
+    
+  } catch (error) {
+    showAlert('danger', `更新失败: ${error.message}`);
+  }
+}
+
+function updateMonitorButtons(isRunning) {
+  const startBtn = document.getElementById('startMonitorBtn');
+  const stopBtn = document.getElementById('stopMonitorBtn');
+  
+  if (isRunning) {
+    startBtn.disabled = true;
+    stopBtn.disabled = false;
+  } else {
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+  }
+}
+
+function showAlert(type, message) {
+  const alertDiv = document.createElement('div');
+  alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+  alertDiv.innerHTML = `
+    ${message}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  `;
+  
+  document.querySelector('.container').insertBefore(alertDiv, document.querySelector('.row'));
+  
+  // 自动隐藏
+  setTimeout(() => {
+    const bsAlert = new bootstrap.Alert(alertDiv);
+    bsAlert.close();
+  }, 5000);
+}
+
+// 页面加载时更新按钮状态
+document.addEventListener('DOMContentLoaded', function() {
+  const monitorRunning = <%- JSON.stringify(diagnostic.monitor && diagnostic.monitor.isRunning) %>;
+  updateMonitorButtons(monitorRunning);
+});
+
+<%- include('../partials/footer') %>

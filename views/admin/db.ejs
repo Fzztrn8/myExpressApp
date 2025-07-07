@@ -1,0 +1,122 @@
+<%- include('../partials/header') %>
+
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-database"></i> 数据库表结构管理</h2>
+        <a href="/admin/db/create-table" class="btn btn-primary">
+          <i class="fas fa-plus"></i> 创建新表
+        </a>
+      </div>
+
+      <% if (message) { %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          <%= message %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      <% } %>
+
+      <% if (error) { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <%= error %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      <% } %>
+
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-table"></i> 数据库表列表</h5>
+        </div>
+        <div class="card-body">
+          <% if (tables && tables.length > 0) { %>
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead class="table-light">
+                  <tr>
+                    <th>表名</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% tables.forEach(function(table) { %>
+                    <tr>
+                      <td>
+                        <strong><%= table.table_name %></strong>
+                      </td>
+                      <td>
+                        <div class="btn-group" role="group">
+                          <a href="/admin/db/table/<%= table.table_name %>" 
+                             class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-eye"></i> 查看结构
+                          </a>
+                          <button type="button" 
+                                  class="btn btn-sm btn-outline-danger"
+                                  onclick="confirmDropTable('<%= table.table_name %>')">
+                            <i class="fas fa-trash"></i> 删除表
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+          <% } else { %>
+            <div class="text-center py-4">
+              <i class="fas fa-database fa-3x text-muted mb-3"></i>
+              <p class="text-muted">暂无数据库表</p>
+              <a href="/admin/db/create-table" class="btn btn-primary">
+                <i class="fas fa-plus"></i> 创建第一个表
+              </a>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <a href="/admin" class="btn btn-secondary">
+          <i class="fas fa-arrow-left"></i> 返回管理后台
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 删除表确认模态框 -->
+<div class="modal fade" id="dropTableModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">确认删除表</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>您确定要删除表 <strong id="tableNameToDrop"></strong> 吗？</p>
+        <p class="text-danger">
+          <i class="fas fa-exclamation-triangle"></i> 
+          此操作不可逆，表中的所有数据将被永久删除！
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+        <form method="POST" action="/admin/db/drop-table" style="display: inline;">
+          <input type="hidden" name="tableName" id="tableNameInput">
+          <button type="submit" class="btn btn-danger">
+            <i class="fas fa-trash"></i> 确认删除
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function confirmDropTable(tableName) {
+  document.getElementById('tableNameToDrop').textContent = tableName;
+  document.getElementById('tableNameInput').value = tableName;
+  new bootstrap.Modal(document.getElementById('dropTableModal')).show();
+}
+</script>
+
+<%- include('../partials/footer') %> 

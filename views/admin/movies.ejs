@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+        .back-link {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .movie-title {
+            font-weight: bold;
+            color: #333;
+        }
+        .movie-type {
+            background-color: #e9ecef;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        .movie-score {
+            font-weight: bold;
+            color: #28a745;
+        }
+        .actions {
+            display: flex;
+            gap: 5px;
+        }
+        .actions .btn {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .empty-state h3 {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/admin" class="back-link">← 返回管理后台</a>
+        
+        <h1>🎬 电影数据管理</h1>
+        
+        <% if (message) { %>
+            <div class="message <%= message.includes('错误') || message.includes('失败') ? 'error' : '' %>">
+                <%= message %>
+            </div>
+        <% } %>
+        
+        <div class="header-actions">
+            <div>
+                <span>共 <strong><%= movies.length %></strong> 部电影</span>
+            </div>
+            <a href="/admin/movies/add" class="btn btn-primary">➕ 添加新电影</a>
+        </div>
+        
+        <% if (movies.length === 0) { %>
+            <div class="empty-state">
+                <h3>暂无电影数据</h3>
+                <p>点击"添加新电影"开始添加您的第一部电影</p>
+                <a href="/admin/movies/add" class="btn btn-primary">添加电影</a>
+            </div>
+        <% } else { %>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>电影标题</th>
+                        <th>导演</th>
+                        <th>演员</th>
+                        <th>类型</th>
+                        <th>评分</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% movies.forEach(function(movie) { %>
+                        <tr>
+                            <td><%= movie.id %></td>
+                            <td>
+                                <div class="movie-title"><%= movie.title %></div>
+                                <% if (movie.image) { %>
+                                    <div style="font-size: 12px; color: #666;">有海报图片</div>
+                                <% } %>
+                            </td>
+                            <td><%= movie.director || '-' %></td>
+                            <td><%= movie.actor || '-' %></td>
+                            <td>
+                                <% if (movie.type) { %>
+                                    <span class="movie-type"><%= movie.type %></span>
+                                <% } else { %>
+                                    -
+                                <% } %>
+                            </td>
+                            <td>
+                                <% if (movie.score) { %>
+                                    <span class="movie-score">⭐ <%= movie.score %></span>
+                                <% } else { %>
+                                    -
+                                <% } %>
+                            </td>
+                            <td>
+                                <div class="actions">
+                                    <a href="/admin/movies/edit/<%= movie.id %>" class="btn btn-warning">编辑</a>
+                                    <form method="POST" action="/admin/movies/delete/<%= movie.id %>" style="display: inline;" onsubmit="return confirm('确定要删除这部电影吗？')">
+                                        <button type="submit" class="btn btn-danger">删除</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        <% } %>
+        
+        <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 5px;">
+            <h3>💡 操作说明</h3>
+            <ul>
+                <li><strong>添加电影：</strong>点击"添加新电影"按钮，填写电影信息</li>
+                <li><strong>编辑电影：</strong>点击"编辑"按钮修改电影信息</li>
+                <li><strong>删除电影：</strong>点击"删除"按钮移除电影（操作不可恢复）</li>
+                <li><strong>批量导入：</strong>可以前往"批量数据导入"页面进行大量数据录入</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html> 

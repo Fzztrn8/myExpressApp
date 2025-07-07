@@ -1,0 +1,237 @@
+<%- include('../partials/header') %>
+
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+          <i class="fas fa-video"></i> 
+          <%= action === 'add' ? '添加视频' : '编辑视频' %>
+        </h2>
+        <a href="/admin/videos" class="btn btn-secondary">
+          <i class="fas fa-arrow-left"></i> 返回视频列表
+        </a>
+      </div>
+
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger alert-dismissible fade show">
+          <%= error %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      <% } %>
+
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">视频信息</h5>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="/admin/videos/<%= action %>" enctype="multipart/form-data">
+            <% if (action === 'edit') { %>
+              <input type="hidden" name="id" value="<%= video.id %>">
+            <% } %>
+            
+            <div class="row">
+              <div class="col-md-8">
+                <div class="mb-3">
+                  <label for="title" class="form-label">视频标题 *</label>
+                  <input type="text" class="form-control" id="title" name="title" 
+                         value="<%= video.title || '' %>" required>
+                  <div class="form-text">请输入视频的标题，这是必填项</div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="description" class="form-label">视频描述</label>
+                  <textarea class="form-control" id="description" name="description" 
+                            rows="4"><%= video.description || '' %></textarea>
+                  <div class="form-text">请输入视频的详细描述，支持HTML标签</div>
+                </div>
+
+                <% if (action === 'add') { %>
+                  <div class="mb-3">
+                    <label for="videoFile" class="form-label">选择视频文件 *</label>
+                    <input type="file" class="form-control" id="videoFile" name="video" 
+                           accept="video/*" required>
+                    <div class="form-text">
+                      支持格式: MP4, AVI, MOV, WMV, FLV, MKV, WebM (最大500MB)
+                    </div>
+                  </div>
+                <% } else { %>
+                  <div class="mb-3">
+                    <label class="form-label">当前视频文件</label>
+                    <div class="input-group">
+                      <input type="text" class="form-control" value="<%= video.filename || '' %>" readonly>
+                      <button type="button" class="btn btn-outline-secondary" onclick="viewVideo()">
+                        <i class="fas fa-play"></i> 播放
+                      </button>
+                    </div>
+                    <div class="form-text">如需更换视频文件，请删除当前视频后重新添加</div>
+                  </div>
+                <% } %>
+
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="format" class="form-label">视频格式</label>
+                      <input type="text" class="form-control" id="format" name="format" 
+                             value="<%= video.format || '' %>" readonly>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="resolution" class="form-label">分辨率</label>
+                      <input type="text" class="form-control" id="resolution" name="resolution" 
+                             value="<%= video.resolution || '' %>" readonly>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="duration" class="form-label">时长 (秒)</label>
+                      <input type="number" class="form-control" id="duration" name="duration" 
+                             value="<%= video.duration || 0 %>" readonly>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="fileSize" class="form-label">文件大小</label>
+                      <input type="text" class="form-control" id="fileSize" name="fileSize" 
+                             value="<%= formatFileSize(video.file_size) %>" readonly>
+                    </div>
+                  </div>
+                </div>
+
+                <% if (action === 'edit') { %>
+                  <div class="mb-3">
+                    <label for="status" class="form-label">状态</label>
+                    <select class="form-control" id="status" name="status">
+                      <option value="active" <%= video.status === 'active' ? 'selected' : '' %>>正常</option>
+                      <option value="inactive" <%= video.status === 'inactive' ? 'selected' : '' %>>禁用</option>
+                    </select>
+                  </div>
+                <% } %>
+              </div>
+
+              <div class="col-md-4">
+                <div class="card">
+                  <div class="card-header">
+                    <h6 class="mb-0">视频预览</h6>
+                  </div>
+                  <div class="card-body text-center">
+                    <% if (action === 'edit' && video.thumbnail) { %>
+                      <img src="<%= video.thumbnail %>" alt="视频缩略图" class="img-fluid mb-3" style="max-height: 200px;">
+                    <% } else { %>
+                      <div class="bg-light border rounded p-4 mb-3" style="height: 200px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-video fa-3x text-muted"></i>
+                      </div>
+                    <% } %>
+                    
+                    <% if (action === 'edit') { %>
+                      <div class="small text-muted">
+                        <div>观看次数: <%= video.view_count || 0 %></div>
+                        <div>点赞数: <%= video.like_count || 0 %></div>
+                        <div>评论数: <%= video.comment_count || 0 %></div>
+                        <div>创建时间: <%= new Date(video.created_at).toLocaleString('zh-CN') %></div>
+                      </div>
+                    <% } %>
+                  </div>
+                </div>
+
+                <div class="card mt-3">
+                  <div class="card-header">
+                    <h6 class="mb-0">操作</h6>
+                  </div>
+                  <div class="card-body">
+                    <div class="d-grid gap-2">
+                      <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> 
+                        <%= action === 'add' ? '添加视频' : '保存修改' %>
+                      </button>
+                      <a href="/admin/videos" class="btn btn-outline-secondary">
+                        <i class="fas fa-times"></i> 取消
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// 文件大小格式化函数
+function formatFileSize(bytes) {
+  if (!bytes) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// 视频文件选择处理
+document.getElementById('videoFile')?.addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (file) {
+    // 更新文件大小显示
+    document.getElementById('fileSize').value = formatFileSize(file.size);
+    
+    // 更新文件格式
+    const extension = file.name.split('.').pop().toLowerCase();
+    document.getElementById('format').value = extension;
+    
+    // 这里可以添加视频时长获取逻辑
+    // 由于需要额外的库，暂时设为0
+    document.getElementById('duration').value = 0;
+  }
+});
+
+// 查看视频
+function viewVideo() {
+  <% if (action === 'edit' && video.file_path) { %>
+    window.open('<%= video.file_path %>', '_blank');
+  <% } %>
+}
+
+// 表单验证
+document.querySelector('form').addEventListener('submit', function(e) {
+  const title = document.getElementById('title').value.trim();
+  if (!title) {
+    e.preventDefault();
+    alert('请输入视频标题');
+    return false;
+  }
+  
+  <% if (action === 'add') { %>
+  const videoFile = document.getElementById('videoFile').files[0];
+  if (!videoFile) {
+    e.preventDefault();
+    alert('请选择视频文件');
+    return false;
+  }
+  
+  // 检查文件大小
+  const maxSize = 500 * 1024 * 1024; // 500MB
+  if (videoFile.size > maxSize) {
+    e.preventDefault();
+    alert('文件大小不能超过500MB');
+    return false;
+  }
+  
+  // 检查文件格式
+  const allowedFormats = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'webm'];
+  const fileExtension = videoFile.name.split('.').pop().toLowerCase();
+  if (!allowedFormats.includes(fileExtension)) {
+    e.preventDefault();
+    alert('不支持的文件格式，请选择支持的视频格式');
+    return false;
+  }
+  <% } %>
+});
+</script>
+
+<%- include('../partials/footer') %> 

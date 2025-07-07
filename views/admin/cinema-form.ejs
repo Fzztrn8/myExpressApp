@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .error {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input[type="text"], input[type="number"], textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+        .back-link {
+            color: #007bff;
+            text-decoration: none;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .required {
+            color: #dc3545;
+        }
+        .help-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .form-actions {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/admin/cinemas" class="back-link">← 返回影院列表</a>
+        
+        <h1><%= action === 'add' ? '➕ 添加新影院' : '✏️ 编辑影院' %></h1>
+        
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="error"><%= error %></div>
+        <% } %>
+        
+        <form method="POST" action="/admin/cinemas/<%= action %><%= action === 'edit' ? '/' + cinema.id : '' %>">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="id">影院ID <span class="required">*</span></label>
+                    <input type="text" id="id" name="id" value="<%= cinema.id || '' %>" <%= action === 'edit' ? 'readonly' : '' %> required>
+                    <div class="help-text">影院唯一标识符，如：C001</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="name">影院名称 <span class="required">*</span></label>
+                    <input type="text" id="name" name="name" value="<%= cinema.name || '' %>" required>
+                    <div class="help-text">影院的完整名称</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="address">影院地址</label>
+                <textarea id="address" name="address"><%= cinema.address || '' %></textarea>
+                <div class="help-text">影院的详细地址信息</div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="city">所在城市</label>
+                    <input type="text" id="city" name="city" value="<%= cinema.city || '' %>">
+                    <div class="help-text">影院所在的城市名称</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="distance_km">距离(公里)</label>
+                    <input type="number" id="distance_km" name="distance_km" value="<%= cinema.distance_km || '' %>" min="0" step="0.1">
+                    <div class="help-text">距离参考点的公里数</div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="avg_price">平均票价(元)</label>
+                    <input type="number" id="avg_price" name="avg_price" value="<%= cinema.avg_price || '' %>" min="0" step="0.01">
+                    <div class="help-text">影院的平均票价</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="rating">评分</label>
+                    <input type="number" id="rating" name="rating" value="<%= cinema.rating || '' %>" min="0" max="10" step="0.1">
+                    <div class="help-text">影院评分，范围：0-10分</div>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <%= action === 'add' ? '添加影院' : '更新影院' %>
+                </button>
+                <a href="/admin/cinemas" class="btn btn-secondary">取消</a>
+            </div>
+        </form>
+        
+        <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 5px;">
+            <h3>💡 填写说明</h3>
+            <ul>
+                <li><strong>影院ID：</strong>必填项，影院的唯一标识符，建议使用字母+数字格式</li>
+                <li><strong>影院名称：</strong>必填项，影院的完整名称</li>
+                <li><strong>影院地址：</strong>影院的详细地址信息</li>
+                <li><strong>所在城市：</strong>影院所在的城市名称</li>
+                <li><strong>距离：</strong>距离参考点的公里数，支持小数点</li>
+                <li><strong>平均票价：</strong>影院的平均票价，支持小数点</li>
+                <li><strong>评分：</strong>0-10分的评分，支持小数点</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html> 

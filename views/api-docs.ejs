@@ -61,39 +61,323 @@
             border-left: 4px solid #28a745;
             margin: 10px 0;
         }
+        .test-section {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+        }
+        .input-group {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .input-group label {
+            font-weight: bold;
+            min-width: 80px;
+            color: #495057;
+        }
+        .input-group input {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+            min-width: 150px;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
         .test-button {
             background-color: #28a745;
             color: white;
             border: none;
-            padding: 8px 15px;
-            border-radius: 3px;
+            padding: 10px 20px;
+            border-radius: 4px;
             cursor: pointer;
-            margin-top: 10px;
+            font-size: 14px;
+            font-weight: bold;
         }
         .test-button:hover {
             background-color: #218838;
         }
+        .test-button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
         .result {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 3px;
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
             display: none;
+            border: 1px solid;
         }
         .success {
             background-color: #d4edda;
-            border: 1px solid #c3e6cb;
+            border-color: #c3e6cb;
             color: #155724;
         }
         .error {
             background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
+            border-color: #f5c6cb;
             color: #721c24;
+        }
+        .loading {
+            background-color: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+        .url-preview {
+            font-family: monospace;
+            background-color: #e9ecef;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+        .clear-button {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .clear-button:hover {
+            background-color: #5a6268;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🎬 电影数据库API文档</h1>
+        
+        <h2>🎭 影院API接口</h2>
+        
+        <div class="endpoint">
+            <span class="method">GET</span>
+            <span class="url">/api/cinemas</span>
+            <div class="description">获取所有影院列表</div>
+            <div class="example">
+                <strong>示例:</strong> GET /api/cinemas
+            </div>
+            <div class="test-section">
+                <div class="url-preview" id="url-preview-cinemas">/api/cinemas</div>
+                <button class="test-button" onclick="testEndpoint('cinemas')">测试接口</button>
+                <button class="clear-button" onclick="clearResult('cinemas')">清除结果</button>
+                <div id="result-cinemas" class="result"></div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method">GET</span>
+            <span class="url">/api/cinemas/:id</span>
+            <div class="description">根据ID获取影院详情</div>
+            <div class="example">
+                <strong>示例:</strong> GET /api/cinemas/C001
+            </div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>影院ID:</label>
+                    <input type="text" id="cinema-id" value="C001" placeholder="输入影院ID">
+                </div>
+                <div class="url-preview" id="url-preview-cinema-id">/api/cinemas/C001</div>
+                <button class="test-button" onclick="testEndpoint('cinema-id')">测试接口</button>
+                <button class="clear-button" onclick="clearResult('cinema-id')">清除结果</button>
+                <div id="result-cinema-id" class="result"></div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method">GET</span>
+            <span class="url">/api/cinemas/city/:city</span>
+            <div class="description">根据城市获取影院</div>
+            <div class="example">
+                <strong>示例:</strong> GET /api/cinemas/city/北京
+            </div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>城市:</label>
+                    <input type="text" id="cinema-city" value="北京" placeholder="输入城市名称">
+                </div>
+                <div class="url-preview" id="url-preview-cinema-city">/api/cinemas/city/北京</div>
+                <button class="test-button" onclick="testEndpoint('cinema-city')">测试接口</button>
+                <button class="clear-button" onclick="clearResult('cinema-city')">清除结果</button>
+                <div id="result-cinema-city" class="result"></div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method">GET</span>
+            <span class="url">/api/cinemas/distance/:maxDistance</span>
+            <div class="description">根据距离获取影院（公里）</div>
+            <div class="example">
+                <strong>示例:</strong> GET /api/cinemas/distance/5
+            </div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>最大距离:</label>
+                    <input type="number" id="cinema-distance" value="5" placeholder="输入距离（公里）">
+                </div>
+                <div class="url-preview" id="url-preview-cinema-distance">/api/cinemas/distance/5</div>
+                <button class="test-button" onclick="testEndpoint('cinema-distance')">测试接口</button>
+                <button class="clear-button" onclick="clearResult('cinema-distance')">清除结果</button>
+                <div id="result-cinema-distance" class="result"></div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method">GET</span>
+            <span class="url">/api/cinemas/price/:minPrice/:maxPrice</span>
+            <div class="description">根据价格范围获取影院</div>
+            <div class="example">
+                <strong>示例:</strong> GET /api/cinemas/price/40/50
+            </div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>最低价格:</label>
+                    <input type="number" id="cinema-min-price" value="40" placeholder="最低价格">
+                    <label>最高价格:</label>
+                    <input type="number" id="cinema-max-price" value="50" placeholder="最高价格">
+                </div>
+                <div class="url-preview" id="url-preview-cinema-price">/api/cinemas/price/40/50</div>
+                <button class="test-button" onclick="testEndpoint('cinema-price')">测试接口</button>
+                <button class="clear-button" onclick="clearResult('cinema-price')">清除结果</button>
+                <div id="result-cinema-price" class="result"></div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method">GET</span>
+            <span class="url">/api/cinemas/rating/:minRating</span>
+            <div class="description">根据最低评分获取影院</div>
+            <div class="example">
+                <strong>示例:</strong> GET /api/cinemas/rating/8.5
+            </div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>最低评分:</label>
+                    <input type="number" id="cinema-rating" value="8.5" step="0.1" placeholder="最低评分">
+                </div>
+                <div class="url-preview" id="url-preview-cinema-rating">/api/cinemas/rating/8.5</div>
+                <button class="test-button" onclick="testEndpoint('cinema-rating')">测试接口</button>
+                <button class="clear-button" onclick="clearResult('cinema-rating')">清除结果</button>
+                <div id="result-cinema-rating" class="result"></div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method">GET</span>
+            <span class="url">/api/cinemas/search/:keyword</span>
+            <div class="description">搜索影院（名称、地址、城市）</div>
+            <div class="example">
+                <strong>示例:</strong> GET /api/cinemas/search/万达
+            </div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>关键词:</label>
+                    <input type="text" id="cinema-search" value="万达" placeholder="输入搜索关键词">
+                </div>
+                <div class="url-preview" id="url-preview-cinema-search">/api/cinemas/search/万达</div>
+                <button class="test-button" onclick="testEndpoint('cinema-search')">测试接口</button>
+                <button class="clear-button" onclick="clearResult('cinema-search')">清除结果</button>
+                <div id="result-cinema-search" class="result"></div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method">GET</span>
+            <span class="url">/api/cinemas/top/:limit</span>
+            <div class="description">获取评分最高的影院</div>
+            <div class="example">
+                <strong>示例:</strong> GET /api/cinemas/top/3
+            </div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>数量限制:</label>
+                    <input type="number" id="cinema-top" value="3" placeholder="返回数量">
+                </div>
+                <div class="url-preview" id="url-preview-cinema-top">/api/cinemas/top/3</div>
+                <button class="test-button" onclick="testEndpoint('cinema-top')">测试接口</button>
+                <button class="clear-button" onclick="clearResult('cinema-top')">清除结果</button>
+                <div id="result-cinema-top" class="result"></div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method">GET</span>
+            <span class="url">/api/cinemas/nearest/:limit</span>
+            <div class="description">获取最近的影院</div>
+            <div class="example">
+                <strong>示例:</strong> GET /api/cinemas/nearest/5
+            </div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>数量限制:</label>
+                    <input type="number" id="cinema-nearest" value="5" placeholder="返回数量">
+                </div>
+                <div class="url-preview" id="url-preview-cinema-nearest">/api/cinemas/nearest/5</div>
+                <button class="test-button" onclick="testEndpoint('cinema-nearest')">测试接口</button>
+                <button class="clear-button" onclick="clearResult('cinema-nearest')">清除结果</button>
+                <div id="result-cinema-nearest" class="result"></div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method">GET</span>
+            <span class="url">/api/cinemas/cheapest/:limit</span>
+            <div class="description">获取最便宜的影院</div>
+            <div class="example">
+                <strong>示例:</strong> GET /api/cinemas/cheapest/3
+            </div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>数量限制:</label>
+                    <input type="number" id="cinema-cheapest" value="3" placeholder="返回数量">
+                </div>
+                <div class="url-preview" id="url-preview-cinema-cheapest">/api/cinemas/cheapest/3</div>
+                <button class="test-button" onclick="testEndpoint('cinema-cheapest')">测试接口</button>
+                <button class="clear-button" onclick="clearResult('cinema-cheapest')">清除结果</button>
+                <div id="result-cinema-cheapest" class="result"></div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method">GET</span>
+            <span class="url">/api/cinemas/stats</span>
+            <div class="description">获取影院统计信息</div>
+            <div class="example">
+                <strong>示例:</strong> GET /api/cinemas/stats
+            </div>
+            <div class="test-section">
+                <div class="url-preview" id="url-preview-cinema-stats">/api/cinemas/stats</div>
+                <button class="test-button" onclick="testEndpoint('cinema-stats')">测试接口</button>
+                <button class="clear-button" onclick="clearResult('cinema-stats')">清除结果</button>
+                <div id="result-cinema-stats" class="result"></div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method">GET</span>
+            <span class="url">/api/cinemas/cities</span>
+            <div class="description">获取所有城市列表</div>
+            <div class="example">
+                <strong>示例:</strong> GET /api/cinemas/cities
+            </div>
+            <div class="test-section">
+                <div class="url-preview" id="url-preview-cinema-cities">/api/cinemas/cities</div>
+                <button class="test-button" onclick="testEndpoint('cinema-cities')">测试接口</button>
+                <button class="clear-button" onclick="clearResult('cinema-cities')">清除结果</button>
+                <div id="result-cinema-cities" class="result"></div>
+            </div>
+        </div>
+
+        <h2>🎬 电影API接口</h2>
         
         <div class="endpoint">
             <span class="method">GET</span>
@@ -102,8 +386,12 @@
             <div class="example">
                 <strong>示例:</strong> GET /api/movies
             </div>
-            <button class="test-button" onclick="testEndpoint('/api/movies')">测试接口</button>
-            <div id="result-1" class="result"></div>
+            <div class="test-section">
+                <div class="url-preview" id="url-preview-movies">/api/movies</div>
+                <button class="test-button" onclick="testEndpoint('movies')">测试接口</button>
+                <button class="clear-button" onclick="clearResult('movies')">清除结果</button>
+                <div id="result-movies" class="result"></div>
+            </div>
         </div>
 
         <div class="endpoint">
@@ -113,8 +401,16 @@
             <div class="example">
                 <strong>示例:</strong> GET /api/movies/1
             </div>
-            <button class="test-button" onclick="testEndpoint('/api/movies/1')">测试接口</button>
-            <div id="result-2" class="result"></div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>电影ID:</label>
+                    <input type="number" id="movie-id" value="1" placeholder="输入电影ID">
+                </div>
+                <div class="url-preview" id="url-preview-movie-id">/api/movies/1</div>
+                <button class="test-button" onclick="testEndpoint('movie-id')">测试接口</button>
+                <button class="clear-button" onclick="clearResult('movie-id')">清除结果</button>
+                <div id="result-movie-id" class="result"></div>
+            </div>
         </div>
 
         <div class="endpoint">
@@ -124,8 +420,16 @@
             <div class="example">
                 <strong>示例:</strong> GET /api/movies/type/动作
             </div>
-            <button class="test-button" onclick="testEndpoint('/api/movies/type/动作')">测试接口</button>
-            <div id="result-3" class="result"></div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>电影类型:</label>
+                    <input type="text" id="movie-type" value="动作" placeholder="输入电影类型">
+                </div>
+                <div class="url-preview" id="url-preview-movie-type">/api/movies/type/动作</div>
+                <button class="test-button" onclick="testEndpoint('movie-type')">测试接口</button>
+                <button class="clear-button" onclick="clearResult('movie-type')">清除结果</button>
+                <div id="result-movie-type" class="result"></div>
+            </div>
         </div>
 
         <div class="endpoint">
@@ -135,8 +439,16 @@
             <div class="example">
                 <strong>示例:</strong> GET /api/movies/director/张艺谋
             </div>
-            <button class="test-button" onclick="testEndpoint('/api/movies/director/张艺谋')">测试接口</button>
-            <div id="result-4" class="result"></div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>导演姓名:</label>
+                    <input type="text" id="movie-director" value="张艺谋" placeholder="输入导演姓名">
+                </div>
+                <div class="url-preview" id="url-preview-movie-director">/api/movies/director/张艺谋</div>
+                <button class="test-button" onclick="testEndpoint('movie-director')">测试接口</button>
+                <button class="clear-button" onclick="clearResult('movie-director')">清除结果</button>
+                <div id="result-movie-director" class="result"></div>
+            </div>
         </div>
 
         <div class="endpoint">
@@ -146,8 +458,16 @@
             <div class="example">
                 <strong>示例:</strong> GET /api/movies/actor/成龙
             </div>
-            <button class="test-button" onclick="testEndpoint('/api/movies/actor/成龙')">测试接口</button>
-            <div id="result-5" class="result"></div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>演员姓名:</label>
+                    <input type="text" id="movie-actor" value="成龙" placeholder="输入演员姓名">
+                </div>
+                <div class="url-preview" id="url-preview-movie-actor">/api/movies/actor/成龙</div>
+                <button class="test-button" onclick="testEndpoint('movie-actor')">测试接口</button>
+                <button class="clear-button" onclick="clearResult('movie-actor')">清除结果</button>
+                <div id="result-movie-actor" class="result"></div>
+            </div>
         </div>
 
         <div class="endpoint">
@@ -157,8 +477,16 @@
             <div class="example">
                 <strong>示例:</strong> GET /api/movies/search/英雄
             </div>
-            <button class="test-button" onclick="testEndpoint('/api/movies/search/英雄')">测试接口</button>
-            <div id="result-6" class="result"></div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>搜索关键词:</label>
+                    <input type="text" id="movie-search" value="英雄" placeholder="输入搜索关键词">
+                </div>
+                <div class="url-preview" id="url-preview-movie-search">/api/movies/search/英雄</div>
+                <button class="test-button" onclick="testEndpoint('movie-search')">测试接口</button>
+                <button class="clear-button" onclick="clearResult('movie-search')">清除结果</button>
+                <div id="result-movie-search" class="result"></div>
+            </div>
         </div>
 
         <div class="endpoint">
@@ -168,8 +496,16 @@
             <div class="example">
                 <strong>示例:</strong> GET /api/movies/top/5
             </div>
-            <button class="test-button" onclick="testEndpoint('/api/movies/top/5')">测试接口</button>
-            <div id="result-7" class="result"></div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>数量限制:</label>
+                    <input type="number" id="movie-top" value="5" placeholder="返回数量">
+                </div>
+                <div class="url-preview" id="url-preview-movie-top">/api/movies/top/5</div>
+                <button class="test-button" onclick="testEndpoint('movie-top')">测试接口</button>
+                <button class="clear-button" onclick="clearResult('movie-top')">清除结果</button>
+                <div id="result-movie-top" class="result"></div>
+            </div>
         </div>
 
         <div class="endpoint">
@@ -179,8 +515,12 @@
             <div class="example">
                 <strong>示例:</strong> GET /api/movies/stats/overview
             </div>
-            <button class="test-button" onclick="testEndpoint('/api/movies/stats/overview')">测试接口</button>
-            <div id="result-8" class="result"></div>
+            <div class="test-section">
+                <div class="url-preview" id="url-preview-movie-stats">/api/movies/stats/overview</div>
+                <button class="test-button" onclick="testEndpoint('movie-stats')">测试接口</button>
+                <button class="clear-button" onclick="clearResult('movie-stats')">清除结果</button>
+                <div id="result-movie-stats" class="result"></div>
+            </div>
         </div>
 
         <div class="response">
@@ -196,41 +536,242 @@
     </div>
 
     <script>
-        async function testEndpoint(url) {
-            const resultId = 'result-' + Math.floor(Math.random() * 1000);
-            const resultDiv = document.createElement('div');
-            resultDiv.id = resultId;
-            resultDiv.className = 'result';
-            resultDiv.style.display = 'block';
-            
-            // 找到对应的结果容器
-            const containers = document.querySelectorAll('.result');
-            const containerIndex = Array.from(containers).findIndex(container => 
-                container.parentElement.querySelector('.test-button') === event.target
-            );
-            
-            if (containerIndex !== -1) {
-                const targetContainer = containers[containerIndex];
-                targetContainer.style.display = 'block';
-                targetContainer.innerHTML = '正在测试...';
-                
-                try {
-                    const response = await fetch(url);
-                    const data = await response.json();
+        // 更新URL预览
+        function updateUrlPreview(endpointId) {
+            const previewElement = document.getElementById(`url-preview-${endpointId}`);
+            if (!previewElement) return;
+
+            let url = '';
+            switch (endpointId) {
+                case 'cinemas':
+                    url = '/api/cinemas';
+                    break;
+                case 'cinema-id':
+                    const cinemaId = document.getElementById('cinema-id').value || 'C001';
+                    url = `/api/cinemas/${encodeURIComponent(cinemaId)}`;
+                    break;
+                case 'cinema-city':
+                    const city = document.getElementById('cinema-city').value || '北京';
+                    url = `/api/cinemas/city/${encodeURIComponent(city)}`;
+                    break;
+                case 'cinema-distance':
+                    const distance = document.getElementById('cinema-distance').value || '5';
+                    url = `/api/cinemas/distance/${distance}`;
+                    break;
+                case 'cinema-price':
+                    const minPrice = document.getElementById('cinema-min-price').value || '40';
+                    const maxPrice = document.getElementById('cinema-max-price').value || '50';
+                    url = `/api/cinemas/price/${minPrice}/${maxPrice}`;
+                    break;
+                case 'cinema-rating':
+                    const rating = document.getElementById('cinema-rating').value || '8.5';
+                    url = `/api/cinemas/rating/${rating}`;
+                    break;
+                case 'cinema-search':
+                    const searchKeyword = document.getElementById('cinema-search').value || '万达';
+                    url = `/api/cinemas/search/${encodeURIComponent(searchKeyword)}`;
+                    break;
+                case 'cinema-top':
+                    const topLimit = document.getElementById('cinema-top').value || '3';
+                    url = `/api/cinemas/top/${topLimit}`;
+                    break;
+                case 'cinema-nearest':
+                    const nearestLimit = document.getElementById('cinema-nearest').value || '5';
+                    url = `/api/cinemas/nearest/${nearestLimit}`;
+                    break;
+                case 'cinema-cheapest':
+                    const cheapestLimit = document.getElementById('cinema-cheapest').value || '3';
+                    url = `/api/cinemas/cheapest/${cheapestLimit}`;
+                    break;
+                case 'cinema-stats':
+                    url = '/api/cinemas/stats';
+                    break;
+                case 'cinema-cities':
+                    url = '/api/cinemas/cities';
+                    break;
+                case 'movies':
+                    url = '/api/movies';
+                    break;
+                case 'movie-id':
+                    const movieId = document.getElementById('movie-id').value || '1';
+                    url = `/api/movies/${movieId}`;
+                    break;
+                case 'movie-type':
+                    const type = document.getElementById('movie-type').value || '动作';
+                    url = `/api/movies/type/${encodeURIComponent(type)}`;
+                    break;
+                case 'movie-director':
+                    const director = document.getElementById('movie-director').value || '张艺谋';
+                    url = `/api/movies/director/${encodeURIComponent(director)}`;
+                    break;
+                case 'movie-actor':
+                    const actor = document.getElementById('movie-actor').value || '成龙';
+                    url = `/api/movies/actor/${encodeURIComponent(actor)}`;
+                    break;
+                case 'movie-search':
+                    const movieSearchTerm = document.getElementById('movie-search').value || '英雄';
+                    url = `/api/movies/search/${encodeURIComponent(movieSearchTerm)}`;
+                    break;
+                case 'movie-top':
+                    const movieTopLimit = document.getElementById('movie-top').value || '5';
+                    url = `/api/movies/top/${movieTopLimit}`;
+                    break;
+                case 'movie-stats':
+                    url = '/api/movies/stats/overview';
+                    break;
+            }
+            previewElement.textContent = url;
+        }
+
+        // 为所有输入框添加事件监听器
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    // 根据输入框的ID确定对应的endpoint
+                    const inputId = this.id;
+                    let endpointId = '';
                     
-                    targetContainer.className = response.ok ? 'result success' : 'result error';
-                    targetContainer.innerHTML = `
-                        <strong>状态码:</strong> ${response.status}<br>
-                        <strong>响应:</strong><br>
-                        <pre>${JSON.stringify(data, null, 2)}</pre>
-                    `;
-                } catch (error) {
-                    targetContainer.className = 'result error';
-                    targetContainer.innerHTML = `
-                        <strong>错误:</strong><br>
-                        <pre>${error.message}</pre>
-                    `;
+                    if (inputId.includes('cinema-')) {
+                        endpointId = inputId;
+                    } else if (inputId.includes('movie-')) {
+                        endpointId = inputId;
+                    }
+                    
+                    if (endpointId) {
+                        updateUrlPreview(endpointId);
+                    }
+                });
+            });
+
+            // 初始化所有URL预览
+            const endpoints = [
+                'cinemas', 'cinema-id', 'cinema-city', 'cinema-distance', 'cinema-price',
+                'cinema-rating', 'cinema-search', 'cinema-top', 'cinema-nearest',
+                'cinema-cheapest', 'cinema-stats', 'cinema-cities',
+                'movies', 'movie-id', 'movie-type', 'movie-director', 'movie-actor',
+                'movie-search', 'movie-top', 'movie-stats'
+            ];
+            
+            endpoints.forEach(endpointId => {
+                updateUrlPreview(endpointId);
+            });
+        });
+
+        async function testEndpoint(endpointId) {
+            const resultDiv = document.getElementById(`result-${endpointId}`);
+            if (!resultDiv) return;
+
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result loading';
+            resultDiv.innerHTML = '正在测试...';
+
+            try {
+                let url = '';
+                switch (endpointId) {
+                    case 'cinemas':
+                        url = '/api/cinemas';
+                        break;
+                    case 'cinema-id':
+                        const cinemaId = document.getElementById('cinema-id').value || 'C001';
+                        url = `/api/cinemas/${encodeURIComponent(cinemaId)}`;
+                        break;
+                    case 'cinema-city':
+                        const city = document.getElementById('cinema-city').value || '北京';
+                        url = `/api/cinemas/city/${encodeURIComponent(city)}`;
+                        break;
+                    case 'cinema-distance':
+                        const distance = document.getElementById('cinema-distance').value || '5';
+                        url = `/api/cinemas/distance/${distance}`;
+                        break;
+                    case 'cinema-price':
+                        const minPrice = document.getElementById('cinema-min-price').value || '40';
+                        const maxPrice = document.getElementById('cinema-max-price').value || '50';
+                        url = `/api/cinemas/price/${minPrice}/${maxPrice}`;
+                        break;
+                    case 'cinema-rating':
+                        const rating = document.getElementById('cinema-rating').value || '8.5';
+                        url = `/api/cinemas/rating/${rating}`;
+                        break;
+                    case 'cinema-search':
+                        const searchKeyword = document.getElementById('cinema-search').value || '万达';
+                        url = `/api/cinemas/search/${encodeURIComponent(searchKeyword)}`;
+                        break;
+                    case 'cinema-top':
+                        const topLimit = document.getElementById('cinema-top').value || '3';
+                        url = `/api/cinemas/top/${topLimit}`;
+                        break;
+                    case 'cinema-nearest':
+                        const nearestLimit = document.getElementById('cinema-nearest').value || '5';
+                        url = `/api/cinemas/nearest/${nearestLimit}`;
+                        break;
+                    case 'cinema-cheapest':
+                        const cheapestLimit = document.getElementById('cinema-cheapest').value || '3';
+                        url = `/api/cinemas/cheapest/${cheapestLimit}`;
+                        break;
+                    case 'cinema-stats':
+                        url = '/api/cinemas/stats';
+                        break;
+                    case 'cinema-cities':
+                        url = '/api/cinemas/cities';
+                        break;
+                    case 'movies':
+                        url = '/api/movies';
+                        break;
+                    case 'movie-id':
+                        const movieId = document.getElementById('movie-id').value || '1';
+                        url = `/api/movies/${movieId}`;
+                        break;
+                    case 'movie-type':
+                        const type = document.getElementById('movie-type').value || '动作';
+                        url = `/api/movies/type/${encodeURIComponent(type)}`;
+                        break;
+                    case 'movie-director':
+                        const director = document.getElementById('movie-director').value || '张艺谋';
+                        url = `/api/movies/director/${encodeURIComponent(director)}`;
+                        break;
+                    case 'movie-actor':
+                        const actor = document.getElementById('movie-actor').value || '成龙';
+                        url = `/api/movies/actor/${encodeURIComponent(actor)}`;
+                        break;
+                    case 'movie-search':
+                        const movieSearchTerm = document.getElementById('movie-search').value || '英雄';
+                        url = `/api/movies/search/${encodeURIComponent(movieSearchTerm)}`;
+                        break;
+                    case 'movie-top':
+                        const movieTopLimit = document.getElementById('movie-top').value || '5';
+                        url = `/api/movies/top/${movieTopLimit}`;
+                        break;
+                    case 'movie-stats':
+                        url = '/api/movies/stats/overview';
+                        break;
                 }
+
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                resultDiv.className = response.ok ? 'result success' : 'result error';
+                resultDiv.innerHTML = `
+                    <strong>请求URL:</strong> ${url}<br>
+                    <strong>状态码:</strong> ${response.status}<br>
+                    <strong>响应时间:</strong> ${new Date().toLocaleTimeString()}<br>
+                    <strong>响应数据:</strong><br>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `
+                    <strong>错误:</strong><br>
+                    <pre>${error.message}</pre>
+                `;
+            }
+        }
+
+        function clearResult(endpointId) {
+            const resultDiv = document.getElementById(`result-${endpointId}`);
+            if (resultDiv) {
+                resultDiv.style.display = 'none';
+                resultDiv.innerHTML = '';
             }
         }
     </script>
