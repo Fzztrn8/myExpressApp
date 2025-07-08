@@ -377,6 +377,25 @@
             </div>
         </div>
 
+        <div class="endpoint">
+            <span class="method">GET</span>
+            <span class="url">/api/cinemas/:id/movies</span>
+            <div class="description">获取指定影院下所有电影信息</div>
+            <div class="example">
+                <strong>示例:</strong> GET /api/cinemas/C001/movies
+            </div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>影院ID:</label>
+                    <input type="text" id="cinema-movies-id" value="C001" placeholder="输入影院ID">
+                </div>
+                <div class="url-preview" id="url-preview-cinema-movies">/api/cinemas/C001/movies</div>
+                <button class="test-button" onclick="testCinemaMoviesEndpoint()">测试接口</button>
+                <button class="clear-button" onclick="clearResult('cinema-movies')">清除结果</button>
+                <div id="result-cinema-movies" class="result"></div>
+            </div>
+        </div>
+
         <h2>🎬 电影API接口</h2>
         
         <div class="endpoint">
@@ -774,6 +793,11 @@
                 case 'cinema-cities':
                     url = '/api/cinemas/cities';
                     break;
+                case 'cinema-movies': {
+                    const cinemaId = document.getElementById('cinema-movies-id').value || 'C001';
+                    url = `/api/cinemas/${encodeURIComponent(cinemaId)}/movies`;
+                    break;
+                }
                 case 'movies':
                     url = '/api/movies';
                     break;
@@ -861,7 +885,7 @@
             const endpoints = [
                 'cinemas', 'cinema-id', 'cinema-city', 'cinema-distance', 'cinema-price',
                 'cinema-rating', 'cinema-search', 'cinema-top', 'cinema-nearest',
-                'cinema-cheapest', 'cinema-stats', 'cinema-cities',
+                'cinema-cheapest', 'cinema-stats', 'cinema-cities', 'cinema-movies',
                 'movies', 'movie-id', 'movie-type', 'movie-director', 'movie-actor',
                 'movie-search', 'movie-top', 'movie-stats',
                 'user-profile', 'check-username',
@@ -931,6 +955,11 @@
                     case 'cinema-cities':
                         url = '/api/cinemas/cities';
                         break;
+                    case 'cinema-movies': {
+                        const cinemaId = document.getElementById('cinema-movies-id').value || 'C001';
+                        url = `/api/cinemas/${encodeURIComponent(cinemaId)}/movies`;
+                        break;
+                    }
                     case 'movies':
                         url = '/api/movies';
                         break;
@@ -1004,6 +1033,26 @@
                 resultDiv.style.display = 'none';
                 resultDiv.innerHTML = '';
             }
+        }
+
+        function testCinemaMoviesEndpoint() {
+            var id = document.getElementById('cinema-movies-id').value;
+            var url = '/api/cinemas/' + encodeURIComponent(id) + '/movies';
+            document.getElementById('url-preview-cinema-movies').innerText = url;
+            var resultDiv = document.getElementById('result-cinema-movies');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result loading';
+            resultDiv.innerText = '加载中...';
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerText = JSON.stringify(data, null, 2);
+                })
+                .catch(err => {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerText = '请求失败: ' + err;
+                });
         }
     </script>
 </body>
