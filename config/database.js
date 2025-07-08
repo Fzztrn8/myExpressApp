@@ -248,6 +248,58 @@ const mockUsers = [
   }
 ];
 
+// 模拟视频数据
+const mockVideos = [
+  {
+    id: 1,
+    video_id: 'video_001',
+    title: '本地视频示例1',
+    description: '这是一个本地存储的视频示例',
+    platform: 'local',
+    thumbnail: '/images/video1.jpg',
+    duration: 180,
+    view_count: 1000,
+    like_count: 50,
+    comment_count: 10,
+    created_by: 'admin',
+    created_at: '2024-01-01T00:00:00.000Z',
+    updated_at: '2024-01-01T00:00:00.000Z',
+    status: 'active'
+  },
+  {
+    id: 2,
+    video_id: 'video_002',
+    title: '本地视频示例2',
+    description: '另一个本地存储的视频示例',
+    platform: 'local',
+    thumbnail: '/images/video2.jpg',
+    duration: 240,
+    view_count: 2000,
+    like_count: 100,
+    comment_count: 20,
+    created_by: 'admin',
+    created_at: '2024-01-15T00:00:00.000Z',
+    updated_at: '2024-01-15T00:00:00.000Z',
+    status: 'active'
+  },
+  {
+    id: 3,
+    video_id: 'video_003',
+    title: '本地视频示例3',
+    description: '第三个本地存储的视频示例',
+    platform: 'local',
+    thumbnail: '/images/video3.jpg',
+    duration: 300,
+    view_count: 1500,
+    like_count: 75,
+    comment_count: 15,
+    created_by: 'admin',
+    created_at: '2024-02-01T00:00:00.000Z',
+    updated_at: '2024-02-01T00:00:00.000Z',
+    status: 'active'
+  }
+];
+
 // 检查环境变量
 const requiredEnvVars = [
   'AZURE_SQL_USER',
@@ -817,6 +869,160 @@ function mockQuery(sqlQuery, params = []) {
   // 用户表创建操作
   if (sqlQuery.includes('CREATE TABLE users')) {
     return Promise.resolve({ recordset: [] });
+  }
+  
+  // 视频查询
+  if (sqlQuery.includes('SELECT * FROM videos') || sqlQuery.includes('SELECT id, video_id, title, description, platform, url, thumbnail, duration, view_count, like_count, comment_count, created_by, created_at, updated_at, status FROM videos')) {
+    let filteredVideos = [...mockVideos];
+    
+    // 根据ID查询
+    if (sqlQuery.includes('WHERE id = @param1')) {
+      const id = parseInt(params[0]);
+      filteredVideos = mockVideos.filter(video => video.id === id);
+    }
+    
+    // 根据外部视频ID查询
+    if (sqlQuery.includes('WHERE video_id = @param1')) {
+      const videoId = params[0];
+      filteredVideos = mockVideos.filter(video => video.video_id === videoId);
+    }
+    
+    // 根据平台查询
+    if (sqlQuery.includes('WHERE platform = @param1')) {
+      const platform = params[0];
+      filteredVideos = mockVideos.filter(video => video.platform === platform);
+    }
+    
+    // 根据状态查询
+    if (sqlQuery.includes('WHERE status = @param1')) {
+      const status = params[0];
+      filteredVideos = mockVideos.filter(video => video.status === status);
+    }
+    
+    // 搜索查询
+    if (sqlQuery.includes('WHERE title LIKE @param1') || sqlQuery.includes('WHERE description LIKE @param1') || sqlQuery.includes('WHERE video_id LIKE @param1')) {
+      const searchTerm = params[0].replace(/%/g, '');
+      filteredVideos = mockVideos.filter(video => 
+        video.title.includes(searchTerm) ||
+        video.description.includes(searchTerm) ||
+        video.video_id.includes(searchTerm)
+      );
+    }
+    
+    // 限制结果数量
+    if (sqlQuery.includes('OFFSET') && sqlQuery.includes('FETCH NEXT')) {
+      const offset = parseInt(params.find(p => p.name === 'offset')?.value || params[1] || 0);
+      const limit = parseInt(params.find(p => p.name === 'limit')?.value || params[2] || 10);
+      filteredVideos = filteredVideos.slice(offset, offset + limit);
+    }
+    
+    // 排序
+    if (sqlQuery.includes('ORDER BY view_count DESC')) {
+      filteredVideos.sort((a, b) => b.view_count - a.view_count);
+    } else if (sqlQuery.includes('ORDER BY like_count DESC')) {
+      filteredVideos.sort((a, b) => b.like_count - a.like_count);
+    } else if (sqlQuery.includes('ORDER BY created_at DESC')) {
+      filteredVideos.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    }
+    
+    return Promise.resolve({ recordset: filteredVideos });
+  }
+  
+  // 视频插入操作
+  if (sqlQuery.includes('INSERT INTO videos')) {
+    const newId = Math.max(...mockVideos.map(v => v.id)) + 1;
+    const newVideo = {
+      id: newId,
+      video_id: params[0],
+      title: params[1],
+      description: params[2],
+      platform: params[3],
+      thumbnail: params[4],
+      duration: params[5],
+      view_count: params[6],
+      like_count: params[7],
+      comment_count: params[8],
+      created_by: params[9],
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      status: 'active'
+    };
+    mockVideos.push(newVideo);
+    return Promise.resolve({ recordset: [newVideo] });
+  }
+  
+  // 视频更新操作
+  if (sqlQuery.includes('UPDATE videos SET')) {
+    const id = parseInt(params[9]);
+    const videoIndex = mockVideos.findIndex(v => v.id === id);
+    if (videoIndex !== -1) {
+      mockVideos[videoIndex] = {
+        ...mockVideos[videoIndex],
+        title: params[0],
+        description: params[1],
+        platform: params[2],
+        thumbnail: params[3],
+        duration: params[4],
+        view_count: params[5],
+        like_count: params[6],
+        comment_count: params[7],
+        status: params[8],
+        updated_at: new Date().toISOString()
+      };
+    }
+    return Promise.resolve({ recordset: [] });
+  }
+  
+  // 视频删除操作
+  if (sqlQuery.includes('DELETE FROM videos WHERE id = @param1')) {
+    const id = parseInt(params[0]);
+    const videoIndex = mockVideos.findIndex(v => v.id === id);
+    if (videoIndex !== -1) {
+      mockVideos.splice(videoIndex, 1);
+    }
+    return Promise.resolve({ recordset: [] });
+  }
+  
+  // 视频统计查询
+  if (sqlQuery.includes('COUNT(*) as total FROM videos')) {
+    const status = params[0];
+    const count = mockVideos.filter(v => v.status === status).length;
+    return Promise.resolve({ recordset: [{ total: count }] });
+  }
+  
+  // 全局视频统计查询
+  if (sqlQuery.includes('SUM(view_count) as total_views') || sqlQuery.includes('SUM(like_count) as total_likes') || sqlQuery.includes('SUM(comment_count) as total_comments')) {
+    const stats = {
+      total_videos: mockVideos.length,
+      total_views: mockVideos.reduce((sum, v) => sum + v.view_count, 0),
+      total_likes: mockVideos.reduce((sum, v) => sum + v.like_count, 0),
+      total_comments: mockVideos.reduce((sum, v) => sum + v.comment_count, 0),
+      avg_duration: mockVideos.reduce((sum, v) => sum + v.duration, 0) / mockVideos.length,
+      active_videos: mockVideos.filter(v => v.status === 'active').length
+    };
+    return Promise.resolve({ recordset: [stats] });
+  }
+  
+  // 平台分布统计查询
+  if (sqlQuery.includes('platform, COUNT(*) as count')) {
+    const platformStats = {};
+    mockVideos.forEach(video => {
+      if (video.status === 'active') {
+        platformStats[video.platform] = platformStats[video.platform] || { count: 0, total_views: 0, total_likes: 0 };
+        platformStats[video.platform].count++;
+        platformStats[video.platform].total_views += video.view_count;
+        platformStats[video.platform].total_likes += video.like_count;
+      }
+    });
+    
+    const result = Object.entries(platformStats).map(([platform, stats]) => ({
+      platform,
+      count: stats.count,
+      total_views: stats.total_views,
+      total_likes: stats.total_likes
+    }));
+    
+    return Promise.resolve({ recordset: result });
   }
   
   // 电影插入操作

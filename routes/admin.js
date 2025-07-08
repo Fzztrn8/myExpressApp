@@ -1170,4 +1170,11 @@ router.get('/user-stats', requireAuth, async (req, res) => {
   }
 });
 
+// 功能文档页面
+router.get('/docs', requireAuth, (req, res) => {
+  res.render('admin/docs', { 
+    title: '功能文档'
+  });
+});
+
 module.exports = router; 

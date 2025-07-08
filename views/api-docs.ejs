@@ -533,6 +533,189 @@
                 <li><strong>message:</strong> 错误信息（当success为false时）</li>
             </ul>
         </div>
+
+        <h2>👥 用户管理API接口</h2>
+        
+        <div class="endpoint">
+            <span class="method">POST</span>
+            <span class="url">/users/register</span>
+            <div class="description">用户注册</div>
+            <div class="example">
+                <strong>示例:</strong> POST /users/register<br>
+                <strong>请求体:</strong> { "username": "testuser", "password": "123456", "email": "test@example.com" }
+            </div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>用户名:</label>
+                    <input type="text" id="user-username" value="testuser" placeholder="输入用户名">
+                </div>
+                <div class="input-group">
+                    <label>密码:</label>
+                    <input type="password" id="user-password" value="123456" placeholder="输入密码">
+                </div>
+                <div class="input-group">
+                    <label>邮箱:</label>
+                    <input type="email" id="user-email" value="test@example.com" placeholder="输入邮箱">
+                </div>
+                <button class="test-button" onclick="testUserEndpoint('register')">测试注册</button>
+                <button class="clear-button" onclick="clearResult('user-register')">清除结果</button>
+                <div id="result-user-register" class="result"></div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method">POST</span>
+            <span class="url">/users/login</span>
+            <div class="description">用户登录</div>
+            <div class="example">
+                <strong>示例:</strong> POST /users/login<br>
+                <strong>请求体:</strong> { "username": "testuser", "password": "123456" }
+            </div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>用户名:</label>
+                    <input type="text" id="login-username" value="testuser" placeholder="输入用户名">
+                </div>
+                <div class="input-group">
+                    <label>密码:</label>
+                    <input type="password" id="login-password" value="123456" placeholder="输入密码">
+                </div>
+                <button class="test-button" onclick="testUserEndpoint('login')">测试登录</button>
+                <button class="clear-button" onclick="clearResult('user-login')">清除结果</button>
+                <div id="result-user-login" class="result"></div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method">GET</span>
+            <span class="url">/users/profile</span>
+            <div class="description">获取用户信息（需要登录）</div>
+            <div class="example">
+                <strong>示例:</strong> GET /users/profile
+            </div>
+            <div class="test-section">
+                <div class="url-preview" id="url-preview-user-profile">/users/profile</div>
+                <button class="test-button" onclick="testUserEndpoint('profile')">测试获取信息</button>
+                <button class="clear-button" onclick="clearResult('user-profile')">清除结果</button>
+                <div id="result-user-profile" class="result"></div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method">GET</span>
+            <span class="url">/users/check-username/:username</span>
+            <div class="description">检查用户名是否可用</div>
+            <div class="example">
+                <strong>示例:</strong> GET /users/check-username/testuser
+            </div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>用户名:</label>
+                    <input type="text" id="check-username" value="testuser" placeholder="输入用户名">
+                </div>
+                <div class="url-preview" id="url-preview-check-username">/users/check-username/testuser</div>
+                <button class="test-button" onclick="testUserEndpoint('check-username')">测试检查</button>
+                <button class="clear-button" onclick="clearResult('check-username')">清除结果</button>
+                <div id="result-check-username" class="result"></div>
+            </div>
+        </div>
+
+        <h2>🎥 视频管理API接口</h2>
+        
+        <div class="endpoint">
+            <span class="method">GET</span>
+            <span class="url">/videos</span>
+            <div class="description">获取所有视频列表</div>
+            <div class="example">
+                <strong>示例:</strong> GET /videos
+            </div>
+            <div class="test-section">
+                <div class="url-preview" id="url-preview-videos">/videos</div>
+                <button class="test-button" onclick="testVideoEndpoint('list')">测试接口</button>
+                <button class="clear-button" onclick="clearResult('videos')">清除结果</button>
+                <div id="result-videos" class="result"></div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method">POST</span>
+            <span class="url">/videos</span>
+            <div class="description">添加视频记录</div>
+            <div class="example">
+                <strong>示例:</strong> POST /videos<br>
+                <strong>请求体:</strong> { "video_id": "test_001", "title": "测试视频", "platform": "local" }
+            </div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>视频ID:</label>
+                    <input type="text" id="video-id" value="test_001" placeholder="输入视频ID">
+                </div>
+                <div class="input-group">
+                    <label>标题:</label>
+                    <input type="text" id="video-title" value="测试视频" placeholder="输入视频标题">
+                </div>
+                <div class="input-group">
+                    <label>平台:</label>
+                    <input type="text" id="video-platform" value="local" placeholder="输入平台">
+                </div>
+                <button class="test-button" onclick="testVideoEndpoint('create')">测试添加</button>
+                <button class="clear-button" onclick="clearResult('video-create')">清除结果</button>
+                <div id="result-video-create" class="result"></div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method">GET</span>
+            <span class="url">/videos/:id</span>
+            <div class="description">根据ID获取视频详情</div>
+            <div class="example">
+                <strong>示例:</strong> GET /videos/1
+            </div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>视频ID:</label>
+                    <input type="number" id="video-detail-id" value="1" placeholder="输入视频ID">
+                </div>
+                <div class="url-preview" id="url-preview-video-detail">/videos/1</div>
+                <button class="test-button" onclick="testVideoEndpoint('detail')">测试接口</button>
+                <button class="clear-button" onclick="clearResult('video-detail')">清除结果</button>
+                <div id="result-video-detail" class="result"></div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method">GET</span>
+            <span class="url">/videos/search/:keyword</span>
+            <div class="description">搜索视频</div>
+            <div class="example">
+                <strong>示例:</strong> GET /videos/search/测试
+            </div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>搜索关键词:</label>
+                    <input type="text" id="video-search" value="测试" placeholder="输入搜索关键词">
+                </div>
+                <div class="url-preview" id="url-preview-video-search">/videos/search/测试</div>
+                <button class="test-button" onclick="testVideoEndpoint('search')">测试接口</button>
+                <button class="clear-button" onclick="clearResult('video-search')">清除结果</button>
+                <div id="result-video-search" class="result"></div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method">GET</span>
+            <span class="url">/videos/stats/platforms</span>
+            <div class="description">获取平台统计信息</div>
+            <div class="example">
+                <strong>示例:</strong> GET /videos/stats/platforms
+            </div>
+            <div class="test-section">
+                <div class="url-preview" id="url-preview-video-stats">/videos/stats/platforms</div>
+                <button class="test-button" onclick="testVideoEndpoint('stats')">测试接口</button>
+                <button class="clear-button" onclick="clearResult('video-stats')">清除结果</button>
+                <div id="result-video-stats" class="result"></div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -546,14 +729,16 @@
                 case 'cinemas':
                     url = '/api/cinemas';
                     break;
-                case 'cinema-id':
+                case 'cinema-id': {
                     const cinemaId = document.getElementById('cinema-id').value || 'C001';
                     url = `/api/cinemas/${encodeURIComponent(cinemaId)}`;
                     break;
-                case 'cinema-city':
+                }
+                case 'cinema-city': {
                     const city = document.getElementById('cinema-city').value || '北京';
                     url = `/api/cinemas/city/${encodeURIComponent(city)}`;
                     break;
+                }
                 case 'cinema-distance':
                     const distance = document.getElementById('cinema-distance').value || '5';
                     url = `/api/cinemas/distance/${distance}`;
@@ -619,6 +804,30 @@
                 case 'movie-stats':
                     url = '/api/movies/stats/overview';
                     break;
+                case 'user-profile':
+                    url = '/users/profile';
+                    break;
+                case 'check-username': {
+                    const val = document.getElementById('check-username').value || 'testuser';
+                    url = `/users/check-username/${encodeURIComponent(val)}`;
+                    break;
+                }
+                case 'videos':
+                    url = '/videos';
+                    break;
+                case 'video-detail': {
+                    const val = document.getElementById('video-detail-id').value || '1';
+                    url = `/videos/${val}`;
+                    break;
+                }
+                case 'video-search': {
+                    const val = document.getElementById('video-search').value || '测试';
+                    url = `/videos/search/${encodeURIComponent(val)}`;
+                    break;
+                }
+                case 'video-stats':
+                    url = '/videos/stats/platforms';
+                    break;
             }
             previewElement.textContent = url;
         }
@@ -636,6 +845,10 @@
                         endpointId = inputId;
                     } else if (inputId.includes('movie-')) {
                         endpointId = inputId;
+                    } else if (inputId.includes('user-') || inputId.includes('login-') || inputId.includes('check-')) {
+                        endpointId = inputId;
+                    } else if (inputId.includes('video-')) {
+                        endpointId = inputId;
                     }
                     
                     if (endpointId) {
@@ -650,7 +863,9 @@
                 'cinema-rating', 'cinema-search', 'cinema-top', 'cinema-nearest',
                 'cinema-cheapest', 'cinema-stats', 'cinema-cities',
                 'movies', 'movie-id', 'movie-type', 'movie-director', 'movie-actor',
-                'movie-search', 'movie-top', 'movie-stats'
+                'movie-search', 'movie-top', 'movie-stats',
+                'user-profile', 'check-username',
+                'videos', 'video-detail', 'video-search', 'video-stats'
             ];
             
             endpoints.forEach(endpointId => {
@@ -672,10 +887,11 @@
                     case 'cinemas':
                         url = '/api/cinemas';
                         break;
-                    case 'cinema-id':
+                    case 'cinema-id': {
                         const cinemaId = document.getElementById('cinema-id').value || 'C001';
                         url = `/api/cinemas/${encodeURIComponent(cinemaId)}`;
                         break;
+                    }
                     case 'cinema-city':
                         const city = document.getElementById('cinema-city').value || '北京';
                         url = `/api/cinemas/city/${encodeURIComponent(city)}`;
@@ -745,6 +961,21 @@
                     case 'movie-stats':
                         url = '/api/movies/stats/overview';
                         break;
+                    case 'check-username': {
+                        const val = document.getElementById('check-username').value || 'testuser';
+                        url = `/users/check-username/${encodeURIComponent(val)}`;
+                        break;
+                    }
+                    case 'video-detail': {
+                        const val = document.getElementById('video-detail-id').value || '1';
+                        url = `/videos/${val}`;
+                        break;
+                    }
+                    case 'video-search': {
+                        const val = document.getElementById('video-search').value || '测试';
+                        url = `/videos/search/${encodeURIComponent(val)}`;
+                        break;
+                    }
                 }
 
                 const response = await fetch(url);

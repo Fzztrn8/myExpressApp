@@ -8,6 +8,7 @@
     "test-user": "node test-user-api.js",
     "test-admin": "node test-admin-users.js",
     "test-fix": "node test-user-fix.js",
+    "test-video": "node test-video-api.js",
     "dev": "nodemon ./bin/www"
   },
   "dependencies": {

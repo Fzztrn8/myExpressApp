@@ -48,61 +48,60 @@ class Video {
     }
   }
 
-  // 创建视频
+  // 创建视频记录
   static async createVideo(videoData) {
     try {
       const {
+        video_id, // 视频ID
         title,
         description,
-        filename,
-        file_path,
-        file_size,
-        duration,
-        thumbnail,
-        format,
-        resolution,
+        platform, // 视频平台（local, youtube, bilibili, etc.）
+        thumbnail, // 缩略图URL
+        duration, // 视频时长（秒）
+        view_count = 0, // 观看次数
+        like_count = 0, // 点赞数
+        comment_count = 0, // 评论数
         created_by
       } = videoData;
 
       const sqlQuery = `
-        INSERT INTO videos (title, description, filename, file_path, file_size, duration, thumbnail, format, resolution, created_by)
+        INSERT INTO videos (video_id, title, description, platform, thumbnail, duration, view_count, like_count, comment_count, created_by)
         VALUES (@param1, @param2, @param3, @param4, @param5, @param6, @param7, @param8, @param9, @param10);
         SELECT SCOPE_IDENTITY() as id;
       `;
 
       const result = await db.query(sqlQuery, [
+        video_id,
         title,
         description || '',
-        filename,
-        file_path,
-        file_size || 0,
-        duration || 0,
+        platform || 'local',
         thumbnail || '',
-        format || '',
-        resolution || '',
+        duration || 0,
+        view_count,
+        like_count,
+        comment_count,
         created_by || 'admin'
       ]);
 
       return result.recordset[0].id;
     } catch (error) {
-      console.error('创建视频失败:', error);
+      console.error('创建视频记录失败:', error);
       throw error;
     }
   }
 
-  // 更新视频
+  // 更新视频信息
   static async updateVideo(id, videoData) {
     try {
       const {
         title,
         description,
-        filename,
-        file_path,
-        file_size,
-        duration,
+        platform,
         thumbnail,
-        format,
-        resolution,
+        duration,
+        view_count,
+        like_count,
+        comment_count,
         status
       } = videoData;
 
@@ -110,28 +109,26 @@ class Video {
         UPDATE videos 
         SET title = @param1, 
             description = @param2, 
-            filename = @param3, 
-            file_path = @param4, 
-            file_size = @param5, 
-            duration = @param6, 
-            thumbnail = @param7, 
-            format = @param8, 
-            resolution = @param9, 
-            status = @param10,
+            platform = @param3, 
+            thumbnail = @param4, 
+            duration = @param5, 
+            view_count = @param6, 
+            like_count = @param7, 
+            comment_count = @param8, 
+            status = @param9,
             updated_at = GETDATE()
-        WHERE id = @param11
+        WHERE id = @param10
       `;
 
       await db.query(sqlQuery, [
         title,
         description || '',
-        filename,
-        file_path,
-        file_size || 0,
-        duration || 0,
+        platform || 'local',
         thumbnail || '',
-        format || '',
-        resolution || '',
+        duration || 0,
+        view_count || 0,
+        like_count || 0,
+        comment_count || 0,
         status || 'active',
         id
       ]);
@@ -163,6 +160,30 @@ class Video {
       return true;
     } catch (error) {
       console.error('增加观看次数失败:', error);
+      throw error;
+    }
+  }
+
+  // 更新点赞数
+  static async updateLikeCount(id, likeCount) {
+    try {
+      const sqlQuery = 'UPDATE videos SET like_count = @param1 WHERE id = @param2';
+      await db.query(sqlQuery, [likeCount, id]);
+      return true;
+    } catch (error) {
+      console.error('更新点赞数失败:', error);
+      throw error;
+    }
+  }
+
+  // 更新评论数
+  static async updateCommentCount(id, commentCount) {
+    try {
+      const sqlQuery = 'UPDATE videos SET comment_count = @param1 WHERE id = @param2';
+      await db.query(sqlQuery, [commentCount, id]);
+      return true;
+    } catch (error) {
+      console.error('更新评论数失败:', error);
       throw error;
     }
   }
@@ -202,7 +223,7 @@ class Video {
       const sqlQuery = `
         SELECT * FROM videos 
         WHERE status = @param1 
-        AND (title LIKE @param2 OR description LIKE @param2)
+        AND (title LIKE @param2 OR description LIKE @param2 OR video_id LIKE @param2)
         ORDER BY created_at DESC
         OFFSET @param3 ROWS FETCH NEXT @param4 ROWS ONLY
       `;
@@ -210,11 +231,11 @@ class Video {
       const searchPattern = `%${searchTerm}%`;
       const videos = await db.query(sqlQuery, [status, searchPattern, offset, limit]);
       
-      // 获取搜索结果总数
+      // 获取总数
       const countQuery = `
         SELECT COUNT(*) as total FROM videos 
         WHERE status = @param1 
-        AND (title LIKE @param2 OR description LIKE @param2)
+        AND (title LIKE @param2 OR description LIKE @param2 OR video_id LIKE @param2)
       `;
       const countResult = await db.query(countQuery, [status, searchPattern]);
       const total = countResult.recordset[0].total;
@@ -239,8 +260,8 @@ class Video {
     try {
       const sqlQuery = `
         SELECT * FROM videos 
-        WHERE status = 'active'
-        ORDER BY view_count DESC, like_count DESC
+        WHERE status = 'active' 
+        ORDER BY view_count DESC, like_count DESC 
         OFFSET 0 ROWS FETCH NEXT @param1 ROWS ONLY
       `;
       
@@ -257,8 +278,8 @@ class Video {
     try {
       const sqlQuery = `
         SELECT * FROM videos 
-        WHERE status = 'active'
-        ORDER BY created_at DESC
+        WHERE status = 'active' 
+        ORDER BY created_at DESC 
         OFFSET 0 ROWS FETCH NEXT @param1 ROWS ONLY
       `;
       
@@ -273,109 +294,128 @@ class Video {
   // 获取视频统计信息
   static async getVideoStats(id) {
     try {
-      const sqlQuery = `
+      const video = await this.getVideoById(id);
+      if (!video) {
+        throw new Error('视频不存在');
+      }
+
+      // 获取观看记录统计
+      const viewStatsQuery = `
         SELECT 
-          v.id,
-          v.title,
-          v.view_count,
-          v.like_count,
-          v.comment_count,
-          COUNT(DISTINCT vl.user_id) as unique_likes,
-          COUNT(DISTINCT vc.id) as total_comments,
-          AVG(vw.view_duration) as avg_view_duration,
-          COUNT(CASE WHEN vw.is_completed = 1 THEN 1 END) as completed_views
-        FROM videos v
-        LEFT JOIN video_likes vl ON v.id = vl.video_id
-        LEFT JOIN video_comments vc ON v.id = vc.video_id AND vc.status = 'active'
-        LEFT JOIN video_views vw ON v.id = vw.video_id
-        WHERE v.id = @param1
-        GROUP BY v.id, v.title, v.view_count, v.like_count, v.comment_count
+          COUNT(*) as total_views,
+          COUNT(DISTINCT user_id) as unique_viewers,
+          AVG(view_duration) as avg_duration,
+          COUNT(CASE WHEN is_completed = 1 THEN 1 END) as completed_views
+        FROM video_views 
+        WHERE video_id = @param1
       `;
       
-      const result = await db.query(sqlQuery, [id]);
-      return result.recordset[0] || null;
+      const viewStats = await db.query(viewStatsQuery, [id]);
+      
+      return {
+        video: video,
+        stats: {
+          ...viewStats.recordset[0],
+          like_count: video.like_count,
+          comment_count: video.comment_count
+        }
+      };
     } catch (error) {
       console.error('获取视频统计失败:', error);
       throw error;
     }
   }
 
-  // 获取全局视频统计数据
+  // 获取全局视频统计
   static async getGlobalVideoStats() {
     try {
-      const stats = {};
+      const sqlQuery = `
+        SELECT 
+          COUNT(*) as total_videos,
+          SUM(view_count) as total_views,
+          SUM(like_count) as total_likes,
+          SUM(comment_count) as total_comments,
+          AVG(duration) as avg_duration,
+          COUNT(CASE WHEN status = 'active' THEN 1 END) as active_videos
+        FROM videos 
+        WHERE status != 'deleted'
+      `;
       
-      // 总视频数
-      const totalVideosResult = await db.query('SELECT COUNT(*) as count FROM videos WHERE status = @param1', ['active']);
-      stats.totalVideos = totalVideosResult.recordset[0].count;
-      
-      // 总观看次数
-      const totalViewsResult = await db.query('SELECT SUM(view_count) as total FROM videos');
-      stats.totalViews = totalViewsResult.recordset[0].total || 0;
-      
-      // 总点赞数
-      const totalLikesResult = await db.query('SELECT COUNT(*) as count FROM video_likes');
-      stats.totalLikes = totalLikesResult.recordset[0].count;
-      
-      // 总评论数
-      const totalCommentsResult = await db.query('SELECT COUNT(*) as count FROM video_comments');
-      stats.totalComments = totalCommentsResult.recordset[0].count;
-      
-      // 总存储空间
-      const totalStorageResult = await db.query('SELECT SUM(file_size) as total FROM videos');
-      stats.totalStorage = totalStorageResult.recordset[0].total || 0;
-      
-      // 平均文件大小
-      const avgFileSizeResult = await db.query('SELECT AVG(file_size) as avg FROM videos');
-      stats.avgFileSize = Math.round(avgFileSizeResult.recordset[0].avg || 0);
-      
-      // 活跃用户数（有观看记录的用户）
-      const activeUsersResult = await db.query('SELECT COUNT(DISTINCT user_id) as count FROM video_views WHERE user_id IS NOT NULL');
-      stats.activeUsers = activeUsersResult.recordset[0].count;
-      
-      // 平均观看时长
-      const avgDurationResult = await db.query('SELECT AVG(view_duration) as avg FROM video_views WHERE view_duration > 0');
-      stats.avgViewDuration = Math.round(avgDurationResult.recordset[0].avg || 0);
-      
-      return stats;
+      const result = await db.query(sqlQuery);
+      return result.recordset[0];
     } catch (error) {
       console.error('获取全局视频统计失败:', error);
       throw error;
     }
   }
 
-  // 获取视频格式分布
-  static async getFormatDistribution() {
+  // 获取平台分布统计
+  static async getPlatformDistribution() {
     try {
-      const query = `
-        SELECT format, COUNT(*) as count 
+      const sqlQuery = `
+        SELECT 
+          platform,
+          COUNT(*) as count,
+          SUM(view_count) as total_views,
+          SUM(like_count) as total_likes
         FROM videos 
-        WHERE status = @param1
-        GROUP BY format 
+        WHERE status = 'active'
+        GROUP BY platform
         ORDER BY count DESC
       `;
-      const result = await db.query(query, ['active']);
+      
+      const result = await db.query(sqlQuery);
       return result.recordset;
     } catch (error) {
-      console.error('获取格式分布失败:', error);
+      console.error('获取平台分布统计失败:', error);
       throw error;
     }
   }
 
-  // 获取观看趋势数据
+  // 获取观看趋势
   static async getViewTrend(days = 30) {
     try {
-      const query = `
-        SELECT CAST(viewed_at AS DATE) as date, COUNT(*) as views
+      const sqlQuery = `
+        SELECT 
+          CAST(view_date AS DATE) as date,
+          COUNT(*) as views,
+          COUNT(DISTINCT user_id) as unique_viewers
         FROM video_views 
-        WHERE viewed_at >= DATEADD(day, -@param1, GETDATE())
-        GROUP BY CAST(viewed_at AS DATE)
-        ORDER BY date
+        WHERE view_date >= DATEADD(day, -@param1, GETDATE())
+        GROUP BY CAST(view_date AS DATE)
+        ORDER BY date DESC
       `;
-      const result = await db.query(query, [days]);
+      
+      const result = await db.query(sqlQuery, [days]);
       return result.recordset;
     } catch (error) {
       console.error('获取观看趋势失败:', error);
+      throw error;
+    }
+  }
+
+  // 根据外部视频ID查找视频
+  static async findByExternalId(videoId, platform) {
+    try {
+      const sqlQuery = 'SELECT * FROM videos WHERE video_id = @param1 AND platform = @param2 AND status != @param3';
+      const result = await db.query(sqlQuery, [videoId, platform, 'deleted']);
+      return result.recordset[0] || null;
+    } catch (error) {
+      console.error('根据外部ID查找视频失败:', error);
+      throw error;
+    }
+  }
+
+  // 批量更新视频统计信息
+  static async batchUpdateStats(videoStats) {
+    try {
+      for (const stat of videoStats) {
+        const { id, view_count, like_count, comment_count } = stat;
+        await this.updateVideo(id, { view_count, like_count, comment_count });
+      }
+      return true;
+    } catch (error) {
+      console.error('批量更新视频统计失败:', error);
       throw error;
     }
   }
