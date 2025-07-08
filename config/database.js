@@ -211,12 +211,40 @@ const mockCinemas = [
   },
   {
     id: 'C010',
-    name: '星美国际影城(成都春熙路店)',
+    name: '万达影城(成都春熙路店)',
     address: '成都市锦江区春熙路北段1号春熙路步行街',
-    distance_km: 2.8,
-    avg_price: 38.00,
-    rating: 8.1,
+    distance_km: 0.8,
+    avg_price: 43.00,
+    rating: 8.6,
     city: '成都'
+  }
+];
+
+// 模拟用户数据
+const mockUsers = [
+  {
+    id: 1,
+    username: 'admin',
+    password_hash: '$2a$10$rQZ8K9L2M1N0O1P2Q3R4S5T6U7V8W9X0Y1Z2A3B4C5D6E7F8G9H0I1J2K3L4M5N6O7P8Q9R0S1T2U3V4W5X6Y7Z8A9B0C1D2E3F4G5H6I7J8K9L0M1N2O3P4Q5R6S7T8U9V0W1X2Y3Z',
+    email: 'admin@example.com',
+    phone: '13800138000',
+    created_at: '2024-01-01T00:00:00.000Z'
+  },
+  {
+    id: 2,
+    username: 'testuser',
+    password_hash: '$2a$10$rQZ8K9L2M1N0O1P2Q3R4S5T6U7V8W9X0Y1Z2A3B4C5D6E7F8G9H0I1J2K3L4M5N6O7P8Q9R0S1T2U3V4W5X6Y7Z8A9B0C1D2E3F4G5H6I7J8K9L0M1N2O3P4Q5R6S7T8U9V0W1X2Y3Z',
+    email: 'test@example.com',
+    phone: '13900139000',
+    created_at: '2024-01-15T00:00:00.000Z'
+  },
+  {
+    id: 3,
+    username: 'demo',
+    password_hash: '$2a$10$rQZ8K9L2M1N0O1P2Q3R4S5T6U7V8W9X0Y1Z2A3B4C5D6E7F8G9H0I1J2K3L4M5N6O7P8Q9R0S1T2U3V4W5X6Y7Z8A9B0C1D2E3F4G5H6I7J8K9L0M1N2O3P4Q5R6S7T8U9V0W1X2Y3Z',
+    email: 'demo@example.com',
+    phone: null,
+    created_at: '2024-02-01T00:00:00.000Z'
   }
 ];
 
@@ -709,6 +737,88 @@ function mockQuery(sqlQuery, params = []) {
     return Promise.resolve({ recordset: cities.map(city => ({ city })) });
   }
   
+  // 用户查询
+  if (sqlQuery.includes('SELECT * FROM users') || sqlQuery.includes('SELECT id, username, email, phone, created_at FROM users')) {
+    let filteredUsers = [...mockUsers];
+    
+    // 根据用户名查询
+    if (sqlQuery.includes('WHERE username = @username')) {
+      const username = params.find(p => p.name === 'username')?.value || params[0];
+      filteredUsers = mockUsers.filter(user => user.username === username);
+    }
+    
+    // 根据邮箱查询
+    if (sqlQuery.includes('WHERE email = @email')) {
+      const email = params.find(p => p.name === 'email')?.value || params[0];
+      filteredUsers = mockUsers.filter(user => user.email === email);
+    }
+    
+    // 根据ID查询
+    if (sqlQuery.includes('WHERE id = @id')) {
+      const id = parseInt(params.find(p => p.name === 'id')?.value || params[0]);
+      filteredUsers = mockUsers.filter(user => user.id === id);
+    }
+    
+    // 排序
+    if (sqlQuery.includes('ORDER BY created_at DESC')) {
+      filteredUsers.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    }
+    
+    return Promise.resolve({ recordset: filteredUsers });
+  }
+  
+  // 用户插入操作
+  if (sqlQuery.includes('INSERT INTO users')) {
+    const newId = Math.max(...mockUsers.map(u => u.id)) + 1;
+    const username = params.find(p => p.name === 'username')?.value || params[0];
+    const passwordHash = params.find(p => p.name === 'passwordHash')?.value || params[1];
+    const email = params.find(p => p.name === 'email')?.value || params[2];
+    const phone = params.find(p => p.name === 'phone')?.value || params[3];
+    
+    const newUser = {
+      id: newId,
+      username: username,
+      password_hash: passwordHash,
+      email: email,
+      phone: phone,
+      created_at: new Date().toISOString()
+    };
+    mockUsers.push(newUser);
+    return Promise.resolve({ recordset: [newUser] });
+  }
+  
+  // 用户更新操作
+  if (sqlQuery.includes('UPDATE users SET')) {
+    const id = parseInt(params.find(p => p.name === 'id')?.value || params[0]);
+    const userIndex = mockUsers.findIndex(u => u.id === id);
+    if (userIndex !== -1) {
+      const email = params.find(p => p.name === 'email')?.value || params[1];
+      const phone = params.find(p => p.name === 'phone')?.value || params[2];
+      
+      mockUsers[userIndex] = {
+        ...mockUsers[userIndex],
+        email: email,
+        phone: phone
+      };
+    }
+    return Promise.resolve({ recordset: [] });
+  }
+  
+  // 用户删除操作
+  if (sqlQuery.includes('DELETE FROM users WHERE id = @id')) {
+    const id = parseInt(params.find(p => p.name === 'id')?.value || params[0]);
+    const userIndex = mockUsers.findIndex(u => u.id === id);
+    if (userIndex !== -1) {
+      mockUsers.splice(userIndex, 1);
+    }
+    return Promise.resolve({ recordset: [], rowsAffected: [userIndex !== -1 ? 1 : 0] });
+  }
+  
+  // 用户表创建操作
+  if (sqlQuery.includes('CREATE TABLE users')) {
+    return Promise.resolve({ recordset: [] });
+  }
+  
   // 电影插入操作
   if (sqlQuery.includes('INSERT INTO movies')) {
     const newId = Math.max(...mockMovies.map(m => m.id)) + 1;
@@ -810,9 +920,15 @@ async function query(sqlQuery, params = []) {
     
     const request = pool.request();
     
-    // 添加参数
+    // 添加参数 - 支持命名参数和位置参数
     params.forEach((param, index) => {
-      request.input(`param${index + 1}`, param);
+      if (param && typeof param === 'object' && param.name && param.value !== undefined) {
+        // 命名参数格式: { name: 'username', value: 'test' }
+        request.input(param.name, param.value);
+      } else {
+        // 位置参数格式: 直接传值
+        request.input(`param${index + 1}`, param);
+      }
     });
     
     const result = await request.query(sqlQuery);
