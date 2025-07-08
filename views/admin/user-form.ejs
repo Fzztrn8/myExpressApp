@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #007bff;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0,123,255,0.3);
+        }
+        .form-group input[readonly] {
+            background-color: #f8f9fa;
+            color: #6c757d;
+        }
+        .required {
+            color: #dc3545;
+        }
+        .help-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .error {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .form-actions {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.8;
+        }
+        .password-field {
+            position: relative;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+        }
+        .password-toggle:hover {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/admin/users" class="back-link">← 返回用户管理</a>
+        
+        <h1><%= action === 'add' ? '➕ 添加用户' : '✏️ 编辑用户' %></h1>
+        
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="error"><%= error %></div>
+        <% } %>
+        
+        <form method="POST" action="/admin/users/<%= action %>/<%= user.id || '' %>">
+            <div class="form-group">
+                <label for="username">用户名 <span class="required">*</span></label>
+                <input type="text" id="username" name="username" value="<%= user.username || '' %>" 
+                       <%= action === 'edit' ? 'readonly' : '' %> required minlength="3" maxlength="20">
+                <div class="help-text">用户名长度3-20个字符，编辑时不可修改</div>
+            </div>
+            
+            <% if (action === 'add') { %>
+                <div class="form-group">
+                    <label for="password">密码 <span class="required">*</span></label>
+                    <div class="password-field">
+                        <input type="password" id="password" name="password" required minlength="6">
+                        <button type="button" class="password-toggle" onclick="togglePassword('password')">👁️</button>
+                    </div>
+                    <div class="help-text">密码长度至少6个字符</div>
+                </div>
+            <% } %>
+            
+            <div class="form-group">
+                <label for="email">邮箱</label>
+                <input type="email" id="email" name="email" value="<%= user.email || '' %>">
+                <div class="help-text">可选，用于密码重置等功能</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">手机号</label>
+                <input type="tel" id="phone" name="phone" value="<%= user.phone || '' %>" 
+                       pattern="1[3-9]\d{9}" maxlength="11">
+                <div class="help-text">可选，中国大陆手机号格式</div>
+            </div>
+            
+            <div class="form-actions">
+                <a href="/admin/users" class="btn btn-secondary">取消</a>
+                <button type="submit" class="btn btn-primary">
+                    <%= action === 'add' ? '添加用户' : '更新用户' %>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const toggle = field.nextElementSibling;
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                toggle.textContent = '🙈';
+            } else {
+                field.type = 'password';
+                toggle.textContent = '👁️';
+            }
+        }
+
+        // 表单验证
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            
+            // 用户名验证
+            if (username.length < 3 || username.length > 20) {
+                e.preventDefault();
+                alert('用户名长度必须在3-20个字符之间！');
+                return false;
+            }
+            
+            // 邮箱验证
+            if (email && !isValidEmail(email)) {
+                e.preventDefault();
+                alert('请输入有效的邮箱地址！');
+                return false;
+            }
+            
+            // 手机号验证
+            if (phone && !isValidPhone(phone)) {
+                e.preventDefault();
+                alert('请输入有效的手机号！');
+                return false;
+            }
+            
+            // 密码验证（仅添加用户时）
+            <% if (action === 'add') { %>
+            const password = document.getElementById('password').value;
+            if (password.length < 6) {
+                e.preventDefault();
+                alert('密码长度至少6个字符！');
+                return false;
+            }
+            <% } %>
+        });
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function isValidPhone(phone) {
+            const phoneRegex = /^1[3-9]\d{9}$/;
+            return phoneRegex.test(phone);
+        }
+    </script>
+</body>
+</html> 

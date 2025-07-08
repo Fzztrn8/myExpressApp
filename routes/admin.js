@@ -3,6 +3,7 @@ const router = express.Router();
 const Movie = require('../models/movie');
 const Cinema = require('../models/cinema');
 const Video = require('../models/video');
+const User = require('../models/user');
 const db = require('../config/database');
 
 // 管理员密码 - 从环境变量读取，如果没有设置则使用默认密码
@@ -969,6 +970,203 @@ router.post('/videos/delete/:id', requireAuth, async (req, res) => {
     res.redirect('/admin/videos?message=视频删除成功');
   } catch (error) {
     res.redirect(`/admin/videos?message=删除失败: ${error.message}`);
+  }
+});
+
+// ==================== 用户管理路由 ====================
+
+// 用户管理页面
+router.get('/users', requireAuth, async (req, res) => {
+  try {
+    const users = await User.getAllUsers();
+    res.render('admin/users', { 
+      title: '用户管理',
+      users: users,
+      message: req.query.message || ''
+    });
+  } catch (error) {
+    res.render('admin/users', { 
+      title: '用户管理',
+      users: [],
+      message: `错误: ${error.message}`
+    });
+  }
+});
+
+// 添加用户页面
+router.get('/users/add', requireAuth, (req, res) => {
+  res.render('admin/user-form', { 
+    title: '添加用户',
+    user: {},
+    action: 'add'
+  });
+});
+
+// 编辑用户页面
+router.get('/users/edit/:id', requireAuth, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.redirect('/admin/users?message=用户不存在');
+    }
+    res.render('admin/user-form', { 
+      title: '编辑用户',
+      user: user,
+      action: 'edit'
+    });
+  } catch (error) {
+    res.redirect(`/admin/users?message=错误: ${error.message}`);
+  }
+});
+
+// 添加用户
+router.post('/users/add', requireAuth, async (req, res) => {
+  try {
+    const { username, password, email, phone } = req.body;
+    
+    // 验证必填字段
+    if (!username || !password) {
+      return res.render('admin/user-form', { 
+        title: '添加用户',
+        user: req.body,
+        action: 'add',
+        error: '用户名和密码是必填项'
+      });
+    }
+
+    await User.register({
+      username,
+      password,
+      email: email || null,
+      phone: phone || null
+    });
+
+    res.redirect('/admin/users?message=用户添加成功');
+  } catch (error) {
+    res.render('admin/user-form', { 
+      title: '添加用户',
+      user: req.body,
+      action: 'add',
+      error: `添加失败: ${error.message}`
+    });
+  }
+});
+
+// 更新用户信息
+router.post('/users/edit/:id', requireAuth, async (req, res) => {
+  try {
+    const { email, phone } = req.body;
+    
+    await User.updateUser(req.params.id, {
+      email: email || null,
+      phone: phone || null
+    });
+
+    res.redirect('/admin/users?message=用户信息更新成功');
+  } catch (error) {
+    res.render('admin/user-form', { 
+      title: '编辑用户',
+      user: { ...req.body, id: req.params.id },
+      action: 'edit',
+      error: `更新失败: ${error.message}`
+    });
+  }
+});
+
+// 删除用户
+router.post('/users/delete/:id', requireAuth, async (req, res) => {
+  try {
+    const result = await User.deleteUser(req.params.id);
+    if (result) {
+      res.redirect('/admin/users?message=用户删除成功');
+    } else {
+      res.redirect('/admin/users?message=用户不存在');
+    }
+  } catch (error) {
+    res.redirect(`/admin/users?message=删除失败: ${error.message}`);
+  }
+});
+
+// 重置用户密码
+router.post('/users/reset-password/:id', requireAuth, async (req, res) => {
+  try {
+    const { newPassword } = req.body;
+    
+    if (!newPassword || newPassword.length < 6) {
+      return res.redirect('/admin/users?message=新密码长度至少6个字符');
+    }
+
+    // 获取用户信息
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.redirect('/admin/users?message=用户不存在');
+    }
+
+    // 使用User模型的方法重置密码
+    const fullUser = await User.findByUsername(user.username);
+    if (!fullUser) {
+      return res.redirect('/admin/users?message=用户不存在');
+    }
+
+    // 直接更新密码哈希
+    const bcrypt = require('bcryptjs');
+    const saltRounds = 10;
+    const newPasswordHash = await bcrypt.hash(newPassword, saltRounds);
+    
+    const updateSQL = 'UPDATE users SET password_hash = @passwordHash WHERE id = @id';
+    const params = [
+      { name: 'id', value: req.params.id },
+      { name: 'passwordHash', value: newPasswordHash }
+    ];
+    
+    await db.query(updateSQL, params);
+
+    res.redirect('/admin/users?message=密码重置成功');
+  } catch (error) {
+    res.redirect(`/admin/users?message=密码重置失败: ${error.message}`);
+  }
+});
+
+// 用户统计页面
+router.get('/user-stats', requireAuth, async (req, res) => {
+  try {
+    const users = await User.getAllUsers();
+    
+    // 计算统计数据
+    const stats = {
+      totalUsers: users.length,
+      usersWithEmail: users.filter(u => u.email).length,
+      usersWithPhone: users.filter(u => u.phone).length,
+      recentUsers: users.filter(u => {
+        const createdDate = new Date(u.created_at);
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        return createdDate > weekAgo;
+      }).length
+    };
+
+    // 按创建时间分组
+    const usersByMonth = {};
+    users.forEach(user => {
+      const date = new Date(user.created_at);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      usersByMonth[monthKey] = (usersByMonth[monthKey] || 0) + 1;
+    });
+
+    res.render('admin/user-stats', { 
+      title: '用户统计',
+      stats: stats,
+      users: users,
+      usersByMonth: usersByMonth
+    });
+  } catch (error) {
+    res.render('admin/user-stats', { 
+      title: '用户统计',
+      stats: {},
+      users: [],
+      usersByMonth: {},
+      error: error.message
+    });
   }
 });
 
