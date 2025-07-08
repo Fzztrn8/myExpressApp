@@ -262,6 +262,23 @@ class Cinema {
       throw new Error(`删除影院失败: ${error.message}`);
     }
   }
+
+  // 获取指定影院下所有电影信息
+  static async getMoviesByCinemaId(cinemaId) {
+    try {
+      const query = `
+        SELECT m.*
+        FROM cinema_movie cm
+        JOIN movies m ON cm.movie_id = m.id
+        WHERE cm.cinema_id = @param1
+        ORDER BY m.id
+      `;
+      const result = await db.query(query, [cinemaId]);
+      return result.recordset;
+    } catch (error) {
+      throw new Error(`获取影院电影失败: ${error.message}`);
+    }
+  }
 }
 
 module.exports = Cinema; 
