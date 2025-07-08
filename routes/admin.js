@@ -749,6 +749,26 @@ router.post('/check-connection', requireAuth, async (req, res) => {
   }
 });
 
+// 工具函数：格式化文件大小
+function formatFileSize(size) {
+  if (!size) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  let i = 0;
+  while (size >= 1024 && i < units.length - 1) {
+    size /= 1024;
+    i++;
+  }
+  return size.toFixed(2) + ' ' + units[i];
+}
+
+// 工具函数：格式化时长
+function formatDuration(seconds) {
+  if (!seconds) return '0:00';
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
 // 视频管理页面
 router.get('/videos', requireAuth, async (req, res) => {
   try {
@@ -766,13 +786,17 @@ router.get('/videos', requireAuth, async (req, res) => {
     res.render('admin/videos', { 
       title: '视频管理',
       videos: videos,
-      message: req.query.message || ''
+      message: req.query.message || '',
+      formatFileSize, // 传递格式化文件大小函数
+      formatDuration // 传递格式化时长函数
     });
   } catch (error) {
     res.render('admin/videos', { 
       title: '视频管理',
       videos: [],
-      message: `错误: ${error.message}`
+      message: `错误: ${error.message}`,
+      formatFileSize,
+      formatDuration
     });
   }
 });
