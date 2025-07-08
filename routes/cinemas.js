@@ -43,6 +43,24 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// 获取指定影院下所有电影信息
+router.get('/:id/movies', async (req, res) => {
+  try {
+    const cinemaId = req.params.id;
+    const movies = await Cinema.getMoviesByCinemaId(cinemaId);
+    res.json({
+      success: true,
+      data: movies,
+      count: movies.length
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
 // 根据城市获取影院
 router.get('/city/:city', async (req, res) => {
   try {
