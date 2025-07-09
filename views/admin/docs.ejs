@@ -447,6 +447,20 @@
                 </ul>
             </div>
         </div>
+        <!-- 文档底部新增数据库结构修复说明 -->
+        <div class="doc-section">
+            <h2>🛠️ 数据库结构自动检测与修复</h2>
+            <p>本系统提供一键检测和修复数据库表结构的脚本，适用于首次部署、数据库迁移或表结构异常时：</p>
+            <div class="code-block">node repairDatabaseStructure.js</div>
+            <ul class="feature-list">
+                <li>自动检测 <b>users</b>、<b>videos</b>、<b>video_comments</b> 等核心表是否存在，不存在则自动创建</li>
+                <li>自动检测每个表的字段是否齐全，缺失字段会自动补齐</li>
+                <li>支持 SQL Server 环境</li>
+            </ul>
+            <p>建议在首次部署、数据库迁移或遇到表结构异常时运行。</p>
+            <button class="test-button" onclick="repairDb()">一键修复数据库结构</button>
+            <pre id="repair-log" style="background:#222;color:#b5f4a5;padding:15px;border-radius:5px;display:none;margin-top:15px;max-height:300px;overflow:auto;"></pre>
+        </div>
     </div>
     
     <script>
@@ -562,6 +576,27 @@
                     </ul>
                 `;
             }, 2000);
+        }
+
+        function repairDb() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerText = '正在修复...';
+            const logEl = document.getElementById('repair-log');
+            logEl.style.display = 'block';
+            logEl.innerText = '正在执行修复脚本，请稍候...';
+            fetch('/admin/repair-db', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+                .then(res => res.json())
+                .then(data => {
+                    logEl.innerText = data.log || (data.success ? '修复完成' : '修复失败');
+                    btn.disabled = false;
+                    btn.innerText = '一键修复数据库结构';
+                })
+                .catch(err => {
+                    logEl.innerText = '请求失败：' + err;
+                    btn.disabled = false;
+                    btn.innerText = '一键修复数据库结构';
+                });
         }
     </script>
 </body>

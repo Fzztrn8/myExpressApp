@@ -92,7 +92,15 @@ class Comment {
         content
       ]);
 
-      return result.recordset[0].id;
+      // 兼容mssql多语句返回结构
+      let id = undefined;
+      if (result.recordset && result.recordset[0] && result.recordset[0].id) {
+        id = result.recordset[0].id;
+      } else if (result.recordsets && result.recordsets[1] && result.recordsets[1][0] && result.recordsets[1][0].id) {
+        id = result.recordsets[1][0].id;
+      }
+      if (!id) throw new Error('插入评论后未能获取新ID');
+      return id;
     } catch (error) {
       console.error('创建评论失败:', error);
       throw error;

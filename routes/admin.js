@@ -5,6 +5,7 @@ const Cinema = require('../models/cinema');
 const Video = require('../models/video');
 const User = require('../models/user');
 const db = require('../config/database');
+const { exec } = require('child_process');
 
 // 管理员密码 - 从环境变量读取，如果没有设置则使用默认密码
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
@@ -747,6 +748,16 @@ router.post('/check-connection', requireAuth, async (req, res) => {
       message: `连接检查失败: ${error.message}`
     });
   }
+});
+
+// 一键修复数据库结构并返回日志
+router.post('/repair-db', requireAuth, async (req, res) => {
+  exec('node repairDatabaseStructure.js', { cwd: process.cwd() }, (error, stdout, stderr) => {
+    if (error) {
+      return res.json({ success: false, log: stderr || error.message });
+    }
+    res.json({ success: true, log: stdout });
+  });
 });
 
 // 工具函数：格式化文件大小

@@ -178,3 +178,17 @@ myExpressApp/
 ## 许可证
 
 MIT License 
+
+## 数据库结构自动检测与修复
+
+本项目提供一键检测和修复数据库表结构的脚本：
+
+```bash
+node repairDatabaseStructure.js
+```
+
+- 自动检测 users、videos、video_comments 等核心表是否存在，不存在则自动创建。
+- 自动检测每个表的字段是否齐全，缺失字段会自动补齐。
+- 支持 SQL Server 环境。
+
+> 建议在首次部署、数据库迁移或遇到表结构异常时运行。 
