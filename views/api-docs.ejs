@@ -836,6 +836,27 @@
                 <div id="result-like-comment" class="result"></div>
             </div>
         </div>
+        <div class="endpoint">
+            <span class="method">POST</span>
+            <span class="url">/api/videos/:id/like</span>
+            <div class="description">视频点赞/取消点赞（再次点击即取消）</div>
+            <div class="example">
+                <strong>示例:</strong> POST /api/videos/1/like<br>
+                <strong>请求体:</strong> { "user_id": "testuser" } <span style="color:#888;">(可选，未登录时用IP)</span>
+            </div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>视频ID:</label>
+                    <input type="number" id="like-video-id" value="1" placeholder="输入视频ID">
+                    <label>用户ID:</label>
+                    <input type="text" id="like-user-id" value="testuser" placeholder="可选，未登录可留空">
+                </div>
+                <div class="url-preview" id="url-preview-like-video">/api/videos/1/like</div>
+                <button class="test-button" onclick="testVideoLikeEndpoint()">测试点赞/取消</button>
+                <button class="clear-button" onclick="clearResult('like-video')">清除结果</button>
+                <div id="result-like-video" class="result"></div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -980,6 +1001,15 @@
                     url = `/api/videos/comments/${cid}/like`;
                     break;
                 }
+                case 'like-video': {
+                    const vid = document.getElementById('like-video-id').value || '1';
+                    const userId = document.getElementById('like-user-id').value || '';
+                    url = `/api/videos/${vid}/like`;
+                    if (userId) {
+                        url += `?user_id=${encodeURIComponent(userId)}`;
+                    }
+                    break;
+                }
             }
             previewElement.textContent = url;
         }
@@ -1020,7 +1050,8 @@
                 'videos', 'video-detail', 'video-search', 'video-stats',
                 'comment-video-id', 'comment-page', 'comment-limit',
                 'add-comment-video-id', 'add-comment-content', 'add-comment-parent-id',
-                'delete-comment-id', 'get-comment-id', 'like-comment-id'
+                'delete-comment-id', 'get-comment-id', 'like-comment-id',
+                'like-video-id', 'like-user-id'
             ];
             
             endpoints.forEach(endpointId => {
@@ -1301,6 +1332,43 @@
             resultDiv.style.display = 'block';
             resultDiv.className = 'result loading';
             resultDiv.innerHTML = '正在测试...';
+            try {
+                const response = await fetch(url, options);
+                const data = await response.json();
+                resultDiv.className = response.ok ? 'result success' : 'result error';
+                resultDiv.innerHTML = `
+                    <strong>请求URL:</strong> ${url}<br>
+                    <strong>状态码:</strong> ${response.status}<br>
+                    <strong>响应时间:</strong> ${new Date().toLocaleTimeString()}<br>
+                    <strong>响应数据:</strong><br>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `
+                    <strong>错误:</strong><br>
+                    <pre>${error.message}</pre>
+                `;
+            }
+        }
+
+        async function testVideoLikeEndpoint() {
+            const vid = document.getElementById('like-video-id').value || '1';
+            const userId = document.getElementById('like-user-id').value || '';
+            const url = `/api/videos/${vid}/like`;
+            const options = { method: 'POST' };
+            if (userId) {
+                options.headers = { 'Content-Type': 'application/json' };
+                options.body = JSON.stringify({ user_id: userId });
+            }
+
+            const resultDiv = document.getElementById('result-like-video');
+            if (!resultDiv) return;
+
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result loading';
+            resultDiv.innerHTML = '正在测试...';
+
             try {
                 const response = await fetch(url, options);
                 const data = await response.json();

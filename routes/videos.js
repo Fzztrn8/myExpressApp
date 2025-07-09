@@ -479,4 +479,28 @@ router.post('/comments/:commentId/like', async (req, res) => {
   }
 });
 
+// 视频点赞/取消点赞
+router.post('/:id/like', async (req, res) => {
+  try {
+    const videoId = req.params.id;
+    // 用户标识，优先session.userId，没有则用IP
+    const user_id = req.session?.userId || req.body.user_id || req.ip || req.connection?.remoteAddress || 'guest';
+    const user_ip = req.ip || req.connection?.remoteAddress || '';
+    const user_agent = req.get('User-Agent') || '';
+
+    // 检查视频是否存在
+    const video = await Video.getVideoById(videoId);
+    if (!video) {
+      return res.status(404).json({ success: false, message: '视频不存在' });
+    }
+
+    // 点赞/取消点赞
+    const result = await Like.toggleVideoLike(videoId, { user_id, user_ip, user_agent });
+    res.json({ success: true, ...result });
+  } catch (error) {
+    console.error('视频点赞操作失败:', error);
+    res.status(500).json({ success: false, message: '视频点赞操作失败', error: error.message });
+  }
+});
+
 module.exports = router; 
