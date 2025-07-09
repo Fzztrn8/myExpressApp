@@ -210,16 +210,49 @@
                     </tbody>
                 </table>
                 
-                <h3>🔧 API接口</h3>
-                <div class="api-example">
-                    <strong>用户注册：</strong> POST /users/register<br>
-                    <strong>用户登录：</strong> POST /users/login<br>
-                    <strong>获取用户信息：</strong> GET /users/profile<br>
-                    <strong>更新用户信息：</strong> PUT /users/profile<br>
-                    <strong>修改密码：</strong> PUT /users/password<br>
-                    <strong>检查用户名：</strong> GET /users/check-username/:username<br>
-                    <strong>检查邮箱：</strong> GET /users/check-email/:email
-                </div>
+                <h2>用户管理API接口</h2>
+
+<!-- 获取所有用户列表 -->
+<div class="api-section">
+  <h3><span class="badge bg-primary">GET</span> /api/users</h3>
+  <p>获取所有用户列表</p>
+  <pre><code>示例: GET /api/users</code></pre>
+</div>
+
+<!-- 获取单个用户详情 -->
+<div class="api-section">
+  <h3><span class="badge bg-primary">GET</span> /api/users/:id</h3>
+  <p>获取指定ID的用户详细信息</p>
+  <pre><code>示例: GET /api/users/1</code></pre>
+</div>
+
+<!-- 用户注册 -->
+<div class="api-section">
+  <h3><span class="badge bg-success">POST</span> /api/users/register</h3>
+  <p>用户注册</p>
+  <pre><code>示例: POST /api/users/register</code></pre>
+</div>
+
+<!-- 用户登录 -->
+<div class="api-section">
+  <h3><span class="badge bg-success">POST</span> /api/users/login</h3>
+  <p>用户登录</p>
+  <pre><code>示例: POST /api/users/login</code></pre>
+</div>
+
+<!-- 更新用户信息 -->
+<div class="api-section">
+  <h3><span class="badge bg-warning">PUT</span> /api/users/:id</h3>
+  <p>更新指定ID的用户信息</p>
+  <pre><code>示例: PUT /api/users/1</code></pre>
+</div>
+
+<!-- 删除用户 -->
+<div class="api-section">
+  <h3><span class="badge bg-danger">DELETE</span> /api/users/:id</h3>
+  <p>删除指定ID的用户</p>
+  <pre><code>示例: DELETE /api/users/1</code></pre>
+</div>
                 
                 <h3>🧪 测试功能</h3>
                 <button class="test-button" onclick="testUserAPI()">测试用户API</button>
@@ -336,21 +369,42 @@
                     </tbody>
                 </table>
                 
-                <h3>🔧 API接口</h3>
-                <div class="api-example">
-                    <strong>获取视频列表：</strong> GET /videos<br>
-                    <strong>添加视频记录：</strong> POST /videos<br>
-                    <strong>获取视频详情：</strong> GET /videos/:id<br>
-                    <strong>更新视频信息：</strong> PUT /videos/:id<br>
-                    <strong>删除视频：</strong> DELETE /videos/:id<br>
-                    <strong>搜索视频：</strong> GET /videos/search/:keyword<br>
-                    <strong>获取热门视频：</strong> GET /videos/popular/:limit<br>
-                    <strong>获取最新视频：</strong> GET /videos/latest/:limit<br>
-                    <strong>获取视频统计：</strong> GET /videos/:id/stats<br>
-                    <strong>更新视频统计：</strong> PATCH /videos/:id/stats<br>
-                    <strong>批量更新统计：</strong> PATCH /videos/batch/stats<br>
-                    <strong>获取平台统计：</strong> GET /videos/stats/platforms
-                </div>
+                <h2>视频管理API接口</h2>
+
+<!-- 获取所有视频列表 -->
+<div class="api-section">
+  <h3><span class="badge bg-primary">GET</span> /api/videos</h3>
+  <p>获取所有视频列表</p>
+  <pre><code>示例: GET /api/videos</code></pre>
+</div>
+
+<!-- 获取单个视频详情 -->
+<div class="api-section">
+  <h3><span class="badge bg-primary">GET</span> /api/videos/:id</h3>
+  <p>获取指定ID的视频详细信息</p>
+  <pre><code>示例: GET /api/videos/1</code></pre>
+</div>
+
+<!-- 搜索视频 -->
+<div class="api-section">
+  <h3><span class="badge bg-primary">GET</span> /api/videos/search/:keyword</h3>
+  <p>根据关键词搜索视频</p>
+  <pre><code>示例: GET /api/videos/search/教程</code></pre>
+</div>
+
+<!-- 获取热门视频 -->
+<div class="api-section">
+  <h3><span class="badge bg-primary">GET</span> /api/videos/popular/:limit</h3>
+  <p>获取点赞数最多的视频</p>
+  <pre><code>示例: GET /api/videos/popular/10</code></pre>
+</div>
+
+<!-- 获取最新视频 -->
+<div class="api-section">
+  <h3><span class="badge bg-primary">GET</span> /api/videos/latest/:limit</h3>
+  <p>获取最新上传的视频</p>
+  <pre><code>示例: GET /api/videos/latest/10</code></pre>
+</div>
                 
                 <h3>🧪 测试功能</h3>
                 <button class="test-button" onclick="testVideoAPI()">测试视频API</button>
