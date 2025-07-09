@@ -557,10 +557,10 @@
         
         <div class="endpoint">
             <span class="method">POST</span>
-            <span class="url">/users/register</span>
+            <span class="url">/api/users/register</span>
             <div class="description">用户注册</div>
             <div class="example">
-                <strong>示例:</strong> POST /users/register<br>
+                <strong>示例:</strong> POST /api/users/register<br>
                 <strong>请求体:</strong> { "username": "testuser", "password": "123456", "email": "test@example.com" }
             </div>
             <div class="test-section">
@@ -584,10 +584,10 @@
 
         <div class="endpoint">
             <span class="method">POST</span>
-            <span class="url">/users/login</span>
+            <span class="url">/api/users/login</span>
             <div class="description">用户登录</div>
             <div class="example">
-                <strong>示例:</strong> POST /users/login<br>
+                <strong>示例:</strong> POST /api/users/login<br>
                 <strong>请求体:</strong> { "username": "testuser", "password": "123456" }
             </div>
             <div class="test-section">
@@ -607,13 +607,13 @@
 
         <div class="endpoint">
             <span class="method">GET</span>
-            <span class="url">/users/profile</span>
+            <span class="url">/api/users/profile</span>
             <div class="description">获取用户信息（需要登录）</div>
             <div class="example">
-                <strong>示例:</strong> GET /users/profile
+                <strong>示例:</strong> GET /api/users/profile
             </div>
             <div class="test-section">
-                <div class="url-preview" id="url-preview-user-profile">/users/profile</div>
+                <div class="url-preview" id="url-preview-user-profile">/api/users/profile</div>
                 <button class="test-button" onclick="testUserEndpoint('profile')">测试获取信息</button>
                 <button class="clear-button" onclick="clearResult('user-profile')">清除结果</button>
                 <div id="result-user-profile" class="result"></div>
@@ -622,17 +622,17 @@
 
         <div class="endpoint">
             <span class="method">GET</span>
-            <span class="url">/users/check-username/:username</span>
+            <span class="url">/api/users/check-username/:username</span>
             <div class="description">检查用户名是否可用</div>
             <div class="example">
-                <strong>示例:</strong> GET /users/check-username/testuser
+                <strong>示例:</strong> GET /api/users/check-username/testuser
             </div>
             <div class="test-section">
                 <div class="input-group">
                     <label>用户名:</label>
                     <input type="text" id="check-username" value="testuser" placeholder="输入用户名">
                 </div>
-                <div class="url-preview" id="url-preview-check-username">/users/check-username/testuser</div>
+                <div class="url-preview" id="url-preview-check-username">/api/users/check-username/testuser</div>
                 <button class="test-button" onclick="testUserEndpoint('check-username')">测试检查</button>
                 <button class="clear-button" onclick="clearResult('check-username')">清除结果</button>
                 <div id="result-check-username" class="result"></div>
@@ -643,13 +643,13 @@
         
         <div class="endpoint">
             <span class="method">GET</span>
-            <span class="url">/videos</span>
+            <span class="url">/api/videos</span>
             <div class="description">获取所有视频列表</div>
             <div class="example">
-                <strong>示例:</strong> GET /videos
+                <strong>示例:</strong> GET /api/videos
             </div>
             <div class="test-section">
-                <div class="url-preview" id="url-preview-videos">/videos</div>
+                <div class="url-preview" id="url-preview-videos">/api/videos</div>
                 <button class="test-button" onclick="testVideoEndpoint('list')">测试接口</button>
                 <button class="clear-button" onclick="clearResult('videos')">清除结果</button>
                 <div id="result-videos" class="result"></div>
@@ -658,10 +658,10 @@
 
         <div class="endpoint">
             <span class="method">POST</span>
-            <span class="url">/videos</span>
+            <span class="url">/api/videos</span>
             <div class="description">添加视频记录</div>
             <div class="example">
-                <strong>示例:</strong> POST /videos<br>
+                <strong>示例:</strong> POST /api/videos<br>
                 <strong>请求体:</strong> { "video_id": "test_001", "title": "测试视频", "platform": "local" }
             </div>
             <div class="test-section">
@@ -685,17 +685,17 @@
 
         <div class="endpoint">
             <span class="method">GET</span>
-            <span class="url">/videos/:id</span>
+            <span class="url">/api/videos/:id</span>
             <div class="description">根据ID获取视频详情</div>
             <div class="example">
-                <strong>示例:</strong> GET /videos/1
+                <strong>示例:</strong> GET /api/videos/1
             </div>
             <div class="test-section">
                 <div class="input-group">
                     <label>视频ID:</label>
                     <input type="number" id="video-detail-id" value="1" placeholder="输入视频ID">
                 </div>
-                <div class="url-preview" id="url-preview-video-detail">/videos/1</div>
+                <div class="url-preview" id="url-preview-video-detail">/api/videos/1</div>
                 <button class="test-button" onclick="testVideoEndpoint('detail')">测试接口</button>
                 <button class="clear-button" onclick="clearResult('video-detail')">清除结果</button>
                 <div id="result-video-detail" class="result"></div>
@@ -704,17 +704,17 @@
 
         <div class="endpoint">
             <span class="method">GET</span>
-            <span class="url">/videos/search/:keyword</span>
+            <span class="url">/api/videos/search/:keyword</span>
             <div class="description">搜索视频</div>
             <div class="example">
-                <strong>示例:</strong> GET /videos/search/测试
+                <strong>示例:</strong> GET /api/videos/search/测试
             </div>
             <div class="test-section">
                 <div class="input-group">
                     <label>搜索关键词:</label>
                     <input type="text" id="video-search" value="测试" placeholder="输入搜索关键词">
                 </div>
-                <div class="url-preview" id="url-preview-video-search">/videos/search/测试</div>
+                <div class="url-preview" id="url-preview-video-search">/api/videos/search/测试</div>
                 <button class="test-button" onclick="testVideoEndpoint('search')">测试接口</button>
                 <button class="clear-button" onclick="clearResult('video-search')">清除结果</button>
                 <div id="result-video-search" class="result"></div>
@@ -723,13 +723,13 @@
 
         <div class="endpoint">
             <span class="method">GET</span>
-            <span class="url">/videos/stats/platforms</span>
+            <span class="url">/api/videos/stats/platforms</span>
             <div class="description">获取平台统计信息</div>
             <div class="example">
-                <strong>示例:</strong> GET /videos/stats/platforms
+                <strong>示例:</strong> GET /api/videos/stats/platforms
             </div>
             <div class="test-section">
-                <div class="url-preview" id="url-preview-video-stats">/videos/stats/platforms</div>
+                <div class="url-preview" id="url-preview-video-stats">/api/videos/stats/platforms</div>
                 <button class="test-button" onclick="testVideoEndpoint('stats')">测试接口</button>
                 <button class="clear-button" onclick="clearResult('video-stats')">清除结果</button>
                 <div id="result-video-stats" class="result"></div>
@@ -829,28 +829,28 @@
                     url = '/api/movies/stats/overview';
                     break;
                 case 'user-profile':
-                    url = '/users/profile';
+                    url = '/api/users/profile';
                     break;
                 case 'check-username': {
                     const val = document.getElementById('check-username').value || 'testuser';
-                    url = `/users/check-username/${encodeURIComponent(val)}`;
+                    url = `/api/users/check-username/${encodeURIComponent(val)}`;
                     break;
                 }
                 case 'videos':
-                    url = '/videos';
+                    url = '/api/videos';
                     break;
                 case 'video-detail': {
                     const val = document.getElementById('video-detail-id').value || '1';
-                    url = `/videos/${val}`;
+                    url = `/api/videos/${val}`;
                     break;
                 }
                 case 'video-search': {
                     const val = document.getElementById('video-search').value || '测试';
-                    url = `/videos/search/${encodeURIComponent(val)}`;
+                    url = `/api/videos/search/${encodeURIComponent(val)}`;
                     break;
                 }
                 case 'video-stats':
-                    url = '/videos/stats/platforms';
+                    url = '/api/videos/stats/platforms';
                     break;
             }
             previewElement.textContent = url;
@@ -992,17 +992,17 @@
                         break;
                     case 'check-username': {
                         const val = document.getElementById('check-username').value || 'testuser';
-                        url = `/users/check-username/${encodeURIComponent(val)}`;
+                        url = `/api/users/check-username/${encodeURIComponent(val)}`;
                         break;
                     }
                     case 'video-detail': {
                         const val = document.getElementById('video-detail-id').value || '1';
-                        url = `/videos/${val}`;
+                        url = `/api/videos/${val}`;
                         break;
                     }
                     case 'video-search': {
                         const val = document.getElementById('video-search').value || '测试';
-                        url = `/videos/search/${encodeURIComponent(val)}`;
+                        url = `/api/videos/search/${encodeURIComponent(val)}`;
                         break;
                     }
                 }
