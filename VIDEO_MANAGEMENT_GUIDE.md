@@ -32,7 +32,7 @@
 | title | NVARCHAR(255) | 视频标题 |
 | description | NVARCHAR(1000) | 视频描述 |
 | platform | NVARCHAR(50) | 视频平台（youtube, bilibili等） |
-| url | NVARCHAR(500) | 视频链接 |
+|  |                |  |
 | thumbnail | NVARCHAR(500) | 缩略图URL |
 | duration | INT | 视频时长（秒） |
 | view_count | INT | 观看次数 |
@@ -61,7 +61,6 @@ GET /videos?page=1&limit=12&sortBy=created_at&sortOrder=DESC
       "title": "Rick Astley - Never Gonna Give You Up",
       "description": "经典歌曲Never Gonna Give You Up的官方MV",
       "platform": "youtube",
-      "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
       "thumbnail": "https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
       "duration": 212,
       "view_count": 1500000000,
@@ -90,7 +89,6 @@ Content-Type: application/json
   "title": "视频标题",
   "description": "视频描述",
   "platform": "youtube",
-  "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
   "thumbnail": "https://example.com/thumbnail.jpg",
   "duration": 180,
   "view_count": 1000,
@@ -190,7 +188,6 @@ const videoData = {
   title: 'Rick Astley - Never Gonna Give You Up',
   description: '经典歌曲Never Gonna Give You Up的官方MV',
   platform: 'youtube',
-  url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
   thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
   duration: 212,
   view_count: 1500000000,
@@ -212,7 +209,6 @@ const videoData = {
   title: '【原神】4.0版本PV：「仿若无因的飞鸟」',
   description: '原神4.0版本宣传视频',
   platform: 'bilibili',
-  url: 'https://www.bilibili.com/video/BV1xx411c7mu',
   thumbnail: 'https://i0.hdslb.com/bfs/archive/example.jpg',
   duration: 180,
   view_count: 5000000,
@@ -243,8 +239,7 @@ curl -X POST http://localhost:3000/videos \
   -d '{
     "video_id": "test123",
     "title": "测试视频",
-    "platform": "youtube",
-    "url": "https://www.youtube.com/watch?v=test123"
+    "platform": "youtube"
   }'
 
 # 4. 获取视频详情
@@ -264,12 +259,10 @@ curl -X PATCH http://localhost:3000/videos/1/stats \
 ### YouTube
 - **video_id**: YouTube视频ID（如 `dQw4w9WgXcQ`）
 - **platform**: `youtube`
-- **url格式**: `https://www.youtube.com/watch?v={video_id}`
 
 ### Bilibili
 - **video_id**: Bilibili视频ID（如 `BV1xx411c7mu`）
 - **platform**: `bilibili`
-- **url格式**: `https://www.bilibili.com/video/{video_id}`
 
 ### 其他平台
 - 可以自定义平台名称

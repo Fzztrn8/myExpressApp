@@ -390,4 +390,93 @@ router.get('/stats/trend/:days?', async (req, res) => {
   }
 });
 
+// 获取视频评论列表
+router.get('/:id/comments', async (req, res) => {
+  try {
+    const videoId = req.params.id;
+    const { page = 1, limit = 20, parent_id = null } = req.query;
+    const result = await Comment.getVideoComments(videoId, {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      parentId: parent_id === null ? null : parseInt(parent_id)
+    });
+    res.json({
+      success: true,
+      data: result.comments,
+      pagination: result.pagination
+    });
+  } catch (error) {
+    console.error('获取视频评论失败:', error);
+    res.status(500).json({ success: false, message: '获取评论失败', error: error.message });
+  }
+});
+
+// 添加视频评论
+router.post('/:id/comments', async (req, res) => {
+  try {
+    const videoId = req.params.id;
+    const { parent_id, content } = req.body;
+    const user_id = req.session.userId || 'guest';
+    const user_name = req.session.username || '匿名用户';
+    const user_ip = req.ip || req.connection.remoteAddress;
+    if (!content) {
+      return res.status(400).json({ success: false, message: '评论内容不能为空' });
+    }
+    const commentData = {
+      video_id: videoId,
+      parent_id: parent_id || null,
+      user_id,
+      user_name,
+      user_ip,
+      content
+    };
+    const commentId = await Comment.createComment(commentData);
+    res.json({ success: true, message: '评论发布成功', data: { id: commentId } });
+  } catch (error) {
+    console.error('添加评论失败:', error);
+    res.status(500).json({ success: false, message: '添加评论失败', error: error.message });
+  }
+});
+
+// 删除视频评论（软删除）
+router.delete('/comments/:commentId', async (req, res) => {
+  try {
+    const commentId = req.params.commentId;
+    await Comment.deleteComment(commentId);
+    res.json({ success: true, message: '评论删除成功' });
+  } catch (error) {
+    console.error('删除评论失败:', error);
+    res.status(500).json({ success: false, message: '删除评论失败', error: error.message });
+  }
+});
+
+// 获取单条评论详情
+router.get('/comments/:commentId', async (req, res) => {
+  try {
+    const commentId = req.params.commentId;
+    const comment = await Comment.getCommentById(commentId);
+    if (!comment) {
+      return res.status(404).json({ success: false, message: '评论不存在' });
+    }
+    res.json({ success: true, data: comment });
+  } catch (error) {
+    console.error('获取评论详情失败:', error);
+    res.status(500).json({ success: false, message: '获取评论详情失败', error: error.message });
+  }
+});
+
+// 评论点赞/取消点赞
+router.post('/comments/:commentId/like', async (req, res) => {
+  try {
+    const commentId = req.params.commentId;
+    const user_id = req.session.userId || 'guest';
+    const user_ip = req.ip || req.connection.remoteAddress;
+    const result = await Comment.likeComment(commentId, { user_id, user_ip });
+    res.json({ success: true, ...result });
+  } catch (error) {
+    console.error('评论点赞失败:', error);
+    res.status(500).json({ success: false, message: '评论点赞失败', error: error.message });
+  }
+});
+
 module.exports = router; 

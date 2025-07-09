@@ -1,17 +1,10 @@
--- 视频功能数据库表结构
+-- 视频功能数据库表结构（无文件上传/URL，仅本地ID和统计信息）
 
 -- 1. 视频表
 CREATE TABLE videos (
     id INT IDENTITY(1,1) PRIMARY KEY,
     title NVARCHAR(200) NOT NULL,
     description NVARCHAR(1000),
-    filename NVARCHAR(255) NOT NULL,  -- 本地文件名
-    file_path NVARCHAR(500) NOT NULL, -- 本地文件路径
-    file_size BIGINT,                 -- 文件大小（字节）
-    duration INT,                     -- 视频时长（秒）
-    thumbnail NVARCHAR(500),          -- 缩略图路径
-    format NVARCHAR(50),              -- 视频格式（mp4, avi等）
-    resolution NVARCHAR(50),          -- 分辨率（1920x1080等）
     view_count INT DEFAULT 0,         -- 观看次数
     like_count INT DEFAULT 0,         -- 点赞数
     comment_count INT DEFAULT 0,      -- 评论数
@@ -47,7 +40,7 @@ CREATE TABLE video_comments (
     created_at DATETIME2 DEFAULT GETDATE(),
     updated_at DATETIME2 DEFAULT GETDATE(),
     FOREIGN KEY (video_id) REFERENCES videos(id) ON DELETE CASCADE,
-    FOREIGN KEY (parent_id) REFERENCES video_comments(id) ON DELETE CASCADE
+    FOREIGN KEY (parent_id) REFERENCES video_comments(id)  -- 不加 ON DELETE CASCADE
 );
 
 -- 4. 评论点赞表
@@ -156,9 +149,9 @@ END
 GO
 
 -- 插入示例数据
-INSERT INTO videos (title, description, filename, file_path, file_size, duration, format, resolution, created_by) VALUES
-('示例视频1', '这是一个示例视频描述', 'sample_video_1.mp4', '/uploads/videos/sample_video_1.mp4', 10485760, 120, 'mp4', '1920x1080', 'admin'),
-('示例视频2', '另一个示例视频', 'sample_video_2.mp4', '/uploads/videos/sample_video_2.mp4', 20971520, 180, 'mp4', '1280x720', 'admin');
+INSERT INTO videos (title, description, created_by) VALUES
+('示例视频1', '这是一个示例视频描述', 'admin'),
+('示例视频2', '另一个示例视频', 'admin');
 
 -- 插入示例评论
 INSERT INTO video_comments (video_id, user_id, user_name, content) VALUES
