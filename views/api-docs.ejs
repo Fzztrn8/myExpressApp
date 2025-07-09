@@ -735,6 +735,107 @@
                 <div id="result-video-stats" class="result"></div>
             </div>
         </div>
+
+        <h2>📝 视频评论API接口</h2>
+        <div class="endpoint">
+            <span class="method">GET</span>
+            <span class="url">/api/videos/:id/comments</span>
+            <div class="description">获取视频评论列表（支持分页、楼中楼回复）</div>
+            <div class="example">
+                <strong>示例:</strong> GET /api/videos/1/comments?page=1&limit=10
+            </div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>视频ID:</label>
+                    <input type="number" id="comment-video-id" value="1" placeholder="输入视频ID">
+                    <label>页码:</label>
+                    <input type="number" id="comment-page" value="1" min="1" style="width:60px;">
+                    <label>每页:</label>
+                    <input type="number" id="comment-limit" value="10" min="1" style="width:60px;">
+                </div>
+                <div class="url-preview" id="url-preview-video-comments">/api/videos/1/comments?page=1&limit=10</div>
+                <button class="test-button" onclick="testVideoCommentEndpoint('list')">测试接口</button>
+                <button class="clear-button" onclick="clearResult('video-comments')">清除结果</button>
+                <div id="result-video-comments" class="result"></div>
+            </div>
+        </div>
+        <div class="endpoint">
+            <span class="method">POST</span>
+            <span class="url">/api/videos/:id/comments</span>
+            <div class="description">添加视频评论（支持回复parent_id）</div>
+            <div class="example">
+                <strong>示例:</strong> POST /api/videos/1/comments<br>
+                <strong>请求体:</strong> { "content": "评论内容", "parent_id": 123 }
+            </div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>视频ID:</label>
+                    <input type="number" id="add-comment-video-id" value="1" placeholder="输入视频ID">
+                    <label>内容:</label>
+                    <input type="text" id="add-comment-content" value="测试评论" placeholder="评论内容">
+                    <label>父评论ID:</label>
+                    <input type="number" id="add-comment-parent-id" placeholder="回复评论ID(可选)">
+                </div>
+                <div class="url-preview" id="url-preview-add-comment">/api/videos/1/comments</div>
+                <button class="test-button" onclick="testVideoCommentEndpoint('add')">测试添加</button>
+                <button class="clear-button" onclick="clearResult('add-comment')">清除结果</button>
+                <div id="result-add-comment" class="result"></div>
+            </div>
+        </div>
+        <div class="endpoint">
+            <span class="method">DELETE</span>
+            <span class="url">/api/videos/comments/:commentId</span>
+            <div class="description">删除视频评论（软删除）</div>
+            <div class="example">
+                <strong>示例:</strong> DELETE /api/videos/comments/10
+            </div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>评论ID:</label>
+                    <input type="number" id="delete-comment-id" value="10" placeholder="评论ID">
+                </div>
+                <div class="url-preview" id="url-preview-delete-comment">/api/videos/comments/10</div>
+                <button class="test-button" onclick="testVideoCommentEndpoint('delete')">测试删除</button>
+                <button class="clear-button" onclick="clearResult('delete-comment')">清除结果</button>
+                <div id="result-delete-comment" class="result"></div>
+            </div>
+        </div>
+        <div class="endpoint">
+            <span class="method">GET</span>
+            <span class="url">/api/videos/comments/:commentId</span>
+            <div class="description">获取单条评论详情</div>
+            <div class="example">
+                <strong>示例:</strong> GET /api/videos/comments/10
+            </div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>评论ID:</label>
+                    <input type="number" id="get-comment-id" value="10" placeholder="评论ID">
+                </div>
+                <div class="url-preview" id="url-preview-get-comment">/api/videos/comments/10</div>
+                <button class="test-button" onclick="testVideoCommentEndpoint('get')">测试接口</button>
+                <button class="clear-button" onclick="clearResult('get-comment')">清除结果</button>
+                <div id="result-get-comment" class="result"></div>
+            </div>
+        </div>
+        <div class="endpoint">
+            <span class="method">POST</span>
+            <span class="url">/api/videos/comments/:commentId/like</span>
+            <div class="description">评论点赞/取消点赞</div>
+            <div class="example">
+                <strong>示例:</strong> POST /api/videos/comments/10/like
+            </div>
+            <div class="test-section">
+                <div class="input-group">
+                    <label>评论ID:</label>
+                    <input type="number" id="like-comment-id" value="10" placeholder="评论ID">
+                </div>
+                <div class="url-preview" id="url-preview-like-comment">/api/videos/comments/10/like</div>
+                <button class="test-button" onclick="testVideoCommentEndpoint('like')">测试点赞</button>
+                <button class="clear-button" onclick="clearResult('like-comment')">清除结果</button>
+                <div id="result-like-comment" class="result"></div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -852,6 +953,33 @@
                 case 'video-stats':
                     url = '/api/videos/stats/platforms';
                     break;
+                case 'video-comments': {
+                    const vid = document.getElementById('comment-video-id').value || '1';
+                    const page = document.getElementById('comment-page').value || '1';
+                    const limit = document.getElementById('comment-limit').value || '10';
+                    url = `/api/videos/${vid}/comments?page=${page}&limit=${limit}`;
+                    break;
+                }
+                case 'add-comment': {
+                    const vid = document.getElementById('add-comment-video-id').value || '1';
+                    url = `/api/videos/${vid}/comments`;
+                    break;
+                }
+                case 'delete-comment': {
+                    const cid = document.getElementById('delete-comment-id').value || '10';
+                    url = `/api/videos/comments/${cid}`;
+                    break;
+                }
+                case 'get-comment': {
+                    const cid = document.getElementById('get-comment-id').value || '10';
+                    url = `/api/videos/comments/${cid}`;
+                    break;
+                }
+                case 'like-comment': {
+                    const cid = document.getElementById('like-comment-id').value || '10';
+                    url = `/api/videos/comments/${cid}/like`;
+                    break;
+                }
             }
             previewElement.textContent = url;
         }
@@ -889,7 +1017,10 @@
                 'movies', 'movie-id', 'movie-type', 'movie-director', 'movie-actor',
                 'movie-search', 'movie-top', 'movie-stats',
                 'user-profile', 'check-username',
-                'videos', 'video-detail', 'video-search', 'video-stats'
+                'videos', 'video-detail', 'video-search', 'video-stats',
+                'comment-video-id', 'comment-page', 'comment-limit',
+                'add-comment-video-id', 'add-comment-content', 'add-comment-parent-id',
+                'delete-comment-id', 'get-comment-id', 'like-comment-id'
             ];
             
             endpoints.forEach(endpointId => {
@@ -1053,6 +1184,141 @@
                     resultDiv.className = 'result error';
                     resultDiv.innerText = '请求失败: ' + err;
                 });
+        }
+
+        async function testVideoEndpoint(endpointId) {
+            let url = '';
+            let options = {};
+            switch (endpointId) {
+                case 'list': {
+                    const vid = document.getElementById('video-detail-id').value || '1';
+                    const page = document.getElementById('video-page').value || '1';
+                    const limit = document.getElementById('video-limit').value || '10';
+                    url = `/api/videos/${vid}/comments?page=${page}&limit=${limit}`;
+                    options = { method: 'GET' };
+                    break;
+                }
+                case 'create': {
+                    const vid = document.getElementById('video-id').value || 'test_001';
+                    const title = document.getElementById('video-title').value;
+                    const platform = document.getElementById('video-platform').value;
+                    url = `/api/videos`;
+                    options = {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ video_id: vid, title, platform })
+                    };
+                    break;
+                }
+                case 'detail': {
+                    const vid = document.getElementById('video-detail-id').value || '1';
+                    url = `/api/videos/${vid}`;
+                    options = { method: 'GET' };
+                    break;
+                }
+                case 'search': {
+                    const keyword = document.getElementById('video-search').value || '测试';
+                    url = `/api/videos/search/${encodeURIComponent(keyword)}`;
+                    options = { method: 'GET' };
+                    break;
+                }
+                case 'stats': {
+                    url = '/api/videos/stats/platforms';
+                    options = { method: 'GET' };
+                    break;
+                }
+            }
+            const resultDiv = document.getElementById(`result-${endpointId === 'list' ? 'video-comments' : endpointId === 'create' ? 'video-create' : endpointId === 'detail' ? 'video-detail' : endpointId === 'search' ? 'video-search' : 'video-stats'}`);
+            if (!resultDiv) return;
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result loading';
+            resultDiv.innerHTML = '正在测试...';
+            try {
+                const response = await fetch(url, options);
+                const data = await response.json();
+                resultDiv.className = response.ok ? 'result success' : 'result error';
+                resultDiv.innerHTML = `
+                    <strong>请求URL:</strong> ${url}<br>
+                    <strong>状态码:</strong> ${response.status}<br>
+                    <strong>响应时间:</strong> ${new Date().toLocaleTimeString()}<br>
+                    <strong>响应数据:</strong><br>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `
+                    <strong>错误:</strong><br>
+                    <pre>${error.message}</pre>
+                `;
+            }
+        }
+
+        async function testVideoCommentEndpoint(endpointId) {
+            let url = '';
+            let options = {};
+            switch (endpointId) {
+                case 'list': {
+                    const vid = document.getElementById('comment-video-id').value || '1';
+                    const page = document.getElementById('comment-page').value || '1';
+                    const limit = document.getElementById('comment-limit').value || '10';
+                    url = `/api/videos/${vid}/comments?page=${page}&limit=${limit}`;
+                    options = { method: 'GET' };
+                    break;
+                }
+                case 'add': {
+                    const vid = document.getElementById('add-comment-video-id').value || '1';
+                    const content = document.getElementById('add-comment-content').value;
+                    const parent_id = document.getElementById('add-comment-parent-id').value;
+                    url = `/api/videos/${vid}/comments`;
+                    options = {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ content, parent_id: parent_id || undefined })
+                    };
+                    break;
+                }
+                case 'delete': {
+                    const cid = document.getElementById('delete-comment-id').value || '10';
+                    url = `/api/videos/comments/${cid}`;
+                    options = { method: 'DELETE' };
+                    break;
+                }
+                case 'get': {
+                    const cid = document.getElementById('get-comment-id').value || '10';
+                    url = `/api/videos/comments/${cid}`;
+                    options = { method: 'GET' };
+                    break;
+                }
+                case 'like': {
+                    const cid = document.getElementById('like-comment-id').value || '10';
+                    url = `/api/videos/comments/${cid}/like`;
+                    options = { method: 'POST' };
+                    break;
+                }
+            }
+            const resultDiv = document.getElementById(`result-${endpointId === 'list' ? 'video-comments' : endpointId === 'add' ? 'add-comment' : endpointId === 'delete' ? 'delete-comment' : endpointId === 'get' ? 'get-comment' : 'like-comment'}`);
+            if (!resultDiv) return;
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result loading';
+            resultDiv.innerHTML = '正在测试...';
+            try {
+                const response = await fetch(url, options);
+                const data = await response.json();
+                resultDiv.className = response.ok ? 'result success' : 'result error';
+                resultDiv.innerHTML = `
+                    <strong>请求URL:</strong> ${url}<br>
+                    <strong>状态码:</strong> ${response.status}<br>
+                    <strong>响应时间:</strong> ${new Date().toLocaleTimeString()}<br>
+                    <strong>响应数据:</strong><br>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `
+                    <strong>错误:</strong><br>
+                    <pre>${error.message}</pre>
+                `;
+            }
         }
     </script>
 </body>
